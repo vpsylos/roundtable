@@ -178,8 +178,5 @@ def search():
     computers = Computer.query.filter(Computer.computer_id.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, users=users, computers=computers)
 
-
-app.secret_key = 'jahannam'
-
 if __name__ == '__main__':
     app.run(debug=True)
