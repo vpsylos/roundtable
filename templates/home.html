@@ -41,7 +41,7 @@
                 <td>{{ ticket.appointment_time.strftime('%H:%M') }}</td>
 
                 <!-- Display user name -->
-                <td><a href="{{ url_for('user_profile', user_id=ticket.ticket_user.id) }}">{{ ticket.ticket_user.name }}</a></td>
+                <td><a href="{{ url_for('user_profile', user_id=ticket.ticket_user.id) }}">{{ ticket.user.full_name }}</a></td>
 
                 <!-- Display computer model -->
                 <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model if ticket.computer else 'N/A' }}</a></td>

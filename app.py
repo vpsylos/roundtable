@@ -37,12 +37,21 @@ class User(db.Model):
 class Computer(db.Model):
     __tablename__ = 'computer'
     
-    id = db.Column(db.Integer, primary_key=True)
-    computer_id = db.Column(db.String(50), unique=True, nullable=False)  # Unique identifier for the computer
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    computer_id = db.Column(db.String(50), unique=True, nullable=False)  # Unique identifier (serial number)
     model = db.Column(db.String(100))  # Model of the computer
+    assigned_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key for user assignment
+    location = db.Column(db.String(50))  # Location (office, home, HCS, Recycling Center)
+    room = db.Column(db.String(50))  # Room number or identifier
+    company = db.Column(db.String(100))  # Company of the computer
+    cpu = db.Column(db.String(100))  # CPU specifications
+    ram = db.Column(db.Integer)  # RAM in GB
+    storage = db.Column(db.Integer)  # Storage in GB
+    os = db.Column(db.String(100))  # Operating system
+    date_inventoried = db.Column(db.DateTime)  # Date when the computer was inventoried
+    price = db.Column(db.Float)  # Price of the computer
     
-    # Foreign key to associate with a user
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref='assigned_computers', lazy=True)  # Renamed backref to avoid conflict
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'
@@ -58,6 +67,7 @@ class Ticket(db.Model):
     # Relationships for ticket associations
     computer = db.relationship('Computer', backref='tickets', lazy=True)
 
+
 # Create the database tables
 with app.app_context():
     db.create_all()
@@ -70,12 +80,33 @@ def home():
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
-        name = request.form['name']
-        department = request.form['department']
+        # Capture all required fields from the form
+        full_name = request.form['full_name']
+        pronouns = request.form.get('pronouns')  # Optional
+        role = request.form['role']
+        department = request.form.get('department')  # Optional
+        office_number = request.form.get('office_number')  # Optional
+        cellphone_number = request.form.get('cellphone_number')  # Optional
+        uniID = request.form['uniID']
         email = request.form['email']
-        phone = request.form['phone']
+        office_location = request.form.get('office_location')  # Optional
+        last_replaced_date = request.form.get('last_replaced_date')  # Optional
+        replacement_cycle_years = request.form.get('replacement_cycle_years')  # Optional
         
-        new_user = User(name=name, department=department, email=email, phone=phone)
+        # Create a new User instance with the captured data
+        new_user = User(
+            full_name=full_name,
+            pronouns=pronouns,
+            role=role,
+            department=department,
+            office_number=office_number,
+            cellphone_number=cellphone_number,
+            uniID=uniID,
+            email=email,
+            office_location=office_location,
+            last_replaced_date=datetime.strptime(last_replaced_date, '%Y-%m-%d') if last_replaced_date else None,
+            replacement_cycle_years=int(replacement_cycle_years) if replacement_cycle_years else None
+        )
         
         try:
             db.session.add(new_user)
@@ -95,24 +126,52 @@ def add_computer():
         model = request.form['model']
         user_id = request.form['user_id']
         
+        location = request.form['location']
+        room = request.form.get('room')
+        company = request.form.get('company')
+        cpu = request.form.get('cpu')
+        ram = int(request.form.get('ram')) if request.form.get('ram') else None
+        storage = int(request.form.get('storage')) if request.form.get('storage') else None
+        os = request.form.get('os')
+        
+        date_inventoried = request.form.get('date_inventoried')
+        
+        price = float(request.form.get('price')) if request.form.get('price') else None
+        
         user = User.query.get(user_id)
+        
         if not user:
             flash('User not found', 'error')
             return redirect(url_for('add_computer'))
         
-        new_computer = Computer(computer_id=computer_id, model=model, user_id=user_id)
+        new_computer = Computer(
+            computer_id=computer_id,
+            model=model,
+            assigned_user_id=user_id,
+            location=location,
+            room=room,
+            company=company,
+            cpu=cpu,
+            ram=ram,
+            storage=storage,
+            os=os,
+            date_inventoried=datetime.strptime(date_inventoried, '%Y-%m-%d') if date_inventoried else None,
+            price=price
+        )
         
         try:
             db.session.add(new_computer)
             db.session.commit()
             flash('Computer added successfully!', 'success')
             return redirect(url_for('home'))
+        
         except Exception as e:
             db.session.rollback()
             flash(f'Error adding computer: {str(e)}', 'error')
     
     users = User.query.all()
     return render_template('add_computer.html', users=users)
+
 
 @app.route('/add_ticket', methods=['GET', 'POST'])
 def add_ticket():
@@ -186,7 +245,7 @@ def computer_profile(computer_id):
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('q', '')
-    users = User.query.filter(User.name.ilike(f'%{query}%') | User.email.ilike(f'%{query}%')).all()
+    users = User.query.filter(User.full_name.ilike(f'%{query}%') | User.email.ilike(f'%{query}%')).all()
     computers = Computer.query.filter(Computer.computer_id.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, users=users, computers=computers)
 

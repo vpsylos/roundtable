@@ -39,7 +39,7 @@
         <select id="user_id" name="user_id" required>
             {% for user in users %}
                 <option value="{{ user.id }}" {% if user.id == ticket.user_id %}selected{% endif %}>
-                    {{ user.name }} ({{ user.email }})
+                    {{ user.full_name }} ({{ user.email }})
                 </option>
             {% endfor %}
         </select>
