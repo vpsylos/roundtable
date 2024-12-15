@@ -18,12 +18,19 @@ class User(db.Model):
     __tablename__ = 'user'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    department = db.Column(db.String(100))
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String(20))
+    full_name = db.Column(db.String(100), nullable=False)  # Full name of the user
+    pronouns = db.Column(db.String(20))  # User's pronouns
+    role = db.Column(db.Enum('Faculty', 'Staff', 'Other'), nullable=False)  # Role of the user
+    department = db.Column(db.String(100))  # Department
+    office_number = db.Column(db.String(20))  # Office number
+    cellphone_number = db.Column(db.String(20))  # Cellphone number
+    uniID = db.Column(db.String(20), unique=True, nullable=False)  # University ID
+    email = db.Column(db.String(120), unique=True, nullable=False)  # Email address
+    office_location = db.Column(db.String(100))  # Office location
+    last_replaced_date = db.Column(db.DateTime)  # Last date a computer was replaced
+    replacement_cycle_years = db.Column(db.Integer)  # How often a computer is to be replaced in years
     
-    # Relationship to computers and tickets
+    # Relationships to computers and tickets
     computers = db.relationship('Computer', backref='assigned_user', lazy=True)
     tickets = db.relationship('Ticket', backref='ticket_user', lazy=True)
 
@@ -31,8 +38,8 @@ class Computer(db.Model):
     __tablename__ = 'computer'
     
     id = db.Column(db.Integer, primary_key=True)
-    computer_id = db.Column(db.String(50), unique=True, nullable=False)
-    model = db.Column(db.String(100))
+    computer_id = db.Column(db.String(50), unique=True, nullable=False)  # Unique identifier for the computer
+    model = db.Column(db.String(100))  # Model of the computer
     
     # Foreign key to associate with a user
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -43,10 +50,10 @@ class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for computer association
     computer_id = db.Column(db.Integer, db.ForeignKey('computer.id'), nullable=True)  # Nullable for user association
-    issue_summary = db.Column(db.String(200), nullable=False)
-    status = db.Column(db.String(20), default='Open')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    appointment_time = db.Column(db.DateTime)
+    issue_summary = db.Column(db.String(200), nullable=False)  # Summary of the issue reported in the ticket
+    status = db.Column(db.String(20), default='Open')  # Status of the ticket (e.g., Open, Closed)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp when the ticket was created
+    appointment_time = db.Column(db.DateTime)  # Scheduled appointment time for addressing the issue
 
     # Relationships for ticket associations
     computer = db.relationship('Computer', backref='tickets', lazy=True)
