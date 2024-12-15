@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - {{ user.name }} - University Tech Support</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>University Tech Support</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('add_user') }}">Add User</a>
+            <a href="{{ url_for('add_computer') }}">Add Computer</a>
+            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
+            <form action="{{ url_for('search') }}" method="get">
+                <input type="text" name="q" placeholder="Search users or computers">
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+    </header>
+
+    <main>
+        <h2>{{ user.name }}</h2>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Department:</strong> {{ user.department }}</p>
+        <p><strong>Phone:</strong> {{ user.phone }}</p>
+
+        <h3>Assigned Computers</h3>
+        {% if user.computers %}
+            <ul>
+                {% for computer in user.computers %}
+                    <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model }})</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No computers assigned.</p>
+        {% endif %}
+
+        <h3>Tickets</h3>
+        {% if user.tickets %}
+            <ul>
+                {% for ticket in user.tickets %}
+                    <li>
+                        {{ ticket.issue_summary }} - 
+                        Status: {{ ticket.status }} - 
+                        Date: {{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}
+                        <a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No tickets found.</p>
+        {% endif %}
+    </main>
+</body>
+</html>

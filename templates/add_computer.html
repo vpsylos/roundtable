@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Computer - University Tech Support</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>University Tech Support</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('add_user') }}">Add User</a>
+            <a href="{{ url_for('add_computer') }}">Add Computer</a>
+            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
+            <form action="{{ url_for('search') }}" method="get">
+                <input type="text" name="q" placeholder="Search users or computers">
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+    </header>
+    
+    <h2>Add New Computer</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST">
+        <label for="computer_id">Computer ID:</label>
+        <input type="text" id="computer_id" name="computer_id" required>
+        
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" required>
+        
+        <label for="user_id">Assign to User:</label>
+        <select id="user_id" name="user_id" required>
+            <option value="">Select a user</option>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.name }} ({{ user.email }})</option>
+            {% endfor %}
+        </select>
+        
+        <input type="submit" value="Add Computer">
+    </form>
+</body>
+</html>

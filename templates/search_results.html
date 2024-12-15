@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - University Tech Support</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>University Tech Support</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('add_user') }}">Add User</a>
+            <a href="{{ url_for('add_computer') }}">Add Computer</a>
+            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
+            <form action="{{ url_for('search') }}" method="get">
+                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Search Results for "{{ query }}"</h2>
+        <h3>Users</h3>
+        <ul>
+        {% for user in users %}
+            <li><a href="{{ url_for('user_profile', user_id=user.id) }}">{{ user.name }} ({{ user.email }})</a></li>
+        {% else %}
+            <li>No users found</li>
+        {% endfor %}
+        </ul>
+        <h3>Computers</h3>
+        <ul>
+        {% for computer in computers %}
+            <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model }})</a></li>
+        {% else %}
+            <li>No computers found</li>
+        {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

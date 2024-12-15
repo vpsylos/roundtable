@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Tech Support</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>University Tech Support</h1>
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('add_user') }}">Add User</a>
+            <a href="{{ url_for('add_computer') }}">Add Computer</a>
+            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
+            <form action="{{ url_for('search') }}" method="get">
+                <input type="text" name="q" placeholder="Search users or computers">
+                <button type="submit">Search</button>
+            </form>
+        </nav>
+    </header>
+    
+    <h2>Open Appointments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>User Name</th>
+                <th>Computer Model</th> <!-- Displaying model instead of ID -->
+                <th>Issue Summary</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.appointment_time.strftime('%Y-%m-%d') }}</td>
+                <td>{{ ticket.appointment_time.strftime('%H:%M') }}</td>
+
+                <!-- Display user name -->
+                <td><a href="{{ url_for('user_profile', user_id=ticket.ticket_user.id) }}">{{ ticket.ticket_user.name }}</a></td>
+
+                <!-- Display computer model -->
+                <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model if ticket.computer else 'N/A' }}</a></td>
+
+                <!-- Display other ticket details -->
+                <td>{{ ticket.issue_summary }}</td>
+                <td>{{ ticket.status }}</td>
+                <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
