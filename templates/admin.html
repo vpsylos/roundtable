@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
@@ -15,42 +16,48 @@
             <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
             <a href="{{ url_for('admin') }}">Admin</a>
             <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
+                <input type="text" name="q" placeholder="Search users or computers">
                 <button type="submit">Search</button>
             </form>
         </nav>
     </header>
 
-    
     <h1>Admin Page</h1>
+
     <h2>Delete Users</h2>
-    <ul>
-        {% for user in users %}
-            <li>
-                {{ user.full_name }} ({{ user.email }})
-                <a href="{{ url_for('delete_user', user_id=user.id) }}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <form method="post">
+        <label for="user_email">Select User:</label>
+        <select id="user_email" name="user_email">
+            {% for user in data.users %}
+                <option value="{{ user.email }}">{{ user.full_name }} ({{ user.email }})</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Delete User" name="delete_user">
+    </form>
 
     <h2>Delete Computers</h2>
-    <ul>
-        {% for computer in computers %}
-            <li>
-                {{ computer.computer_id }} ({{ computer.model }})
-                <a href="{{ url_for('delete_computer', computer_id=computer.id) }}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <form method="post">
+        <label for="computer_id">Select Computer:</label>
+        <select id="computer_id" name="computer_id">
+            {% for computer in data.computers %}
+                <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model }})</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Delete Computer" name="delete_computer">
+    </form>
 
     <h2>Delete Tickets</h2>
-    <ul>
-        {% for ticket in tickets %}
-            <li>
-                {{ ticket.issue_summary }} ({{ ticket.status }})
-                <a href="{{ url_for('delete_ticket', ticket_id=ticket.id) }}">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
+    <form method="post">
+        <label for="ticket_id">Select Ticket:</label>
+        <select id="ticket_id" name="ticket_id">
+            {% for ticket in data.tickets %}
+                <option value="{{ ticket.id }}">{{ ticket.issue_summary }} ({{ ticket.status }})</option>
+            {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Delete Ticket" name="delete_ticket">
+    </form>
 </body>
 </html>

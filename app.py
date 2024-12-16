@@ -313,33 +313,39 @@ def search():
     computers = Computer.query.filter(Computer.computer_id.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, users=users, computers=computers)
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
-    return render_template('admin.html')
-
-@app.route('/admin/delete_user/<int:user_id>')
-def delete_user(user_id):
-    # Delete user logic here
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    return redirect(url_for('admin'))
-
-@app.route('/admin/delete_computer/<int:computer_id>')
-def delete_computer(computer_id):
-    # Delete computer logic here
-    computer = Computer.query.get_or_404(computer_id)
-    db.session.delete(computer)
-    db.session.commit()
-    return redirect(url_for('admin'))
-
-@app.route('/admin/delete_ticket/<int:ticket_id>')
-def delete_ticket(ticket_id):
-    # Delete ticket logic here
-    ticket = Ticket.query.get_or_404(ticket_id)
-    db.session.delete(ticket)
-    db.session.commit()
-    return redirect(url_for('admin'))
+    users = User.query.all()
+    computers = Computer.query.all()
+    tickets = Ticket.query.all()
+    
+    print("Users:", users)
+    print("Computers:", computers)
+    print("Tickets:", tickets)
+    
+    if request.method == 'POST':
+        user_email = request.form.get('user_email')
+        computer_id = request.form.get('computer_id')
+        ticket_id = request.form.get('ticket_id')
+        
+        print("User Email:", user_email)
+        print("Computer ID:", computer_id)
+        print("Ticket ID:", ticket_id)
+        
+        if user_email:
+            user = User.query.filter_by(email=user_email).first()
+            db.session.delete(user)
+        elif computer_id:
+            computer = Computer.query.get_or_404(computer_id)
+            db.session.delete(computer)
+        elif ticket_id:
+            ticket = Ticket.query.get_or_404(ticket_id)
+            db.session.delete(ticket)
+        
+        db.session.commit()
+        return redirect(url_for('admin'))
+    
+    return render_template('admin.html', data={'users': users, 'computers': computers, 'tickets': tickets})
 
 if __name__ == '__main__':
     app.run(debug=True)
