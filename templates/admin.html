@@ -28,36 +28,32 @@
     <form method="post">
         <label for="user_email">Select User:</label>
         <select id="user_email" name="user_email">
-            {% for user in data.users %}
-                <option value="{{ user.email }}">{{ user.full_name }} ({{ user.email }})</option>
-            {% endfor %}
+            {% if data.users %}
+                {% for user in data.users %}
+                    <option value="{{ user.email }}">{{ user.full_name }} ({{ user.email }})</option>
+                {% endfor %}
+            {% else %}
+                <option value="">No users found</option>
+            {% endif %}
         </select>
         <br>
-        <input type="submit" value="Delete User" name="delete_user">
+        <input type="submit" value="Delete User, Associated Computers and Tickets" name="delete_user">
     </form>
 
     <h2>Delete Computers</h2>
     <form method="post">
         <label for="computer_id">Select Computer:</label>
         <select id="computer_id" name="computer_id">
-            {% for computer in data.computers %}
-                <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model }})</option>
-            {% endfor %}
+            {% if data.computers %}
+                {% for computer in data.computers %}
+                    <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model }})</option>
+                {% endfor %}
+            {% else %}
+                <option value="">No computers found</option>
+            {% endif %}
         </select>
         <br>
-        <input type="submit" value="Delete Computer" name="delete_computer">
-    </form>
-
-    <h2>Delete Tickets</h2>
-    <form method="post">
-        <label for="ticket_id">Select Ticket:</label>
-        <select id="ticket_id" name="ticket_id">
-            {% for ticket in data.tickets %}
-                <option value="{{ ticket.id }}">{{ ticket.issue_summary }} ({{ ticket.status }})</option>
-            {% endfor %}
-        </select>
-        <br>
-        <input type="submit" value="Delete Ticket" name="delete_ticket">
+        <input type="submit" value="Delete Computer and Associated Tickets" name="delete_computer">
     </form>
 </body>
 </html>

@@ -319,24 +319,30 @@ def admin():
     computers = Computer.query.all()
     tickets = Ticket.query.all()
     
-    print("Users:", users)
-    print("Computers:", computers)
-    print("Tickets:", tickets)
-    
     if request.method == 'POST':
         user_email = request.form.get('user_email')
         computer_id = request.form.get('computer_id')
         ticket_id = request.form.get('ticket_id')
         
-        print("User Email:", user_email)
-        print("Computer ID:", computer_id)
-        print("Ticket ID:", ticket_id)
-        
         if user_email:
             user = User.query.filter_by(email=user_email).first()
+            if user:
+                # Delete all computers associated with the user
+                computers_to_delete = Computer.query.filter_by(assigned_user_id=user.id).all()
+                for computer in computers_to_delete:
+                    # Delete all tickets associated with the computer
+                    tickets_to_delete = Ticket.query.filter_by(computer_id=computer.id).all()
+                    for ticket in tickets_to_delete:
+                        db.session.delete(ticket)
+                    db.session.delete(computer)
             db.session.delete(user)
         elif computer_id:
             computer = Computer.query.get_or_404(computer_id)
+            if computer:
+                # Delete all tickets associated with the computer
+                tickets_to_delete = Ticket.query.filter_by(computer_id=computer.id).all()
+                for ticket in tickets_to_delete:
+                    db.session.delete(ticket)
             db.session.delete(computer)
         elif ticket_id:
             ticket = Ticket.query.get_or_404(ticket_id)
