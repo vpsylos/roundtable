@@ -65,7 +65,8 @@ class Ticket(db.Model):
     appointment_time = db.Column(db.DateTime)  # Scheduled appointment time for addressing the issue
 
     # Relationships for ticket associations
-    computer = db.relationship('Computer', backref='tickets', lazy=True)
+    computer = db.relationship('Computer', backref='computers_tickets', lazy=True)
+    user = db.relationship('User', backref='users_tickets', lazy=True)
 
 
 # Create the database tables
@@ -206,6 +207,41 @@ def add_ticket():
     users = User.query.all()
     computers = Computer.query.all()
     return render_template('add_ticket.html', users=users, computers=computers)
+
+@app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if request.method == 'POST':
+        user.full_name = request.form['full_name']
+        user.pronouns = request.form.get('pronouns')
+        user.role = request.form['role']
+        user.department = request.form.get('department')
+        user.office_number = request.form.get('office_number')
+        user.cellphone_number = request.form.get('cellphone_number')
+        user.uniID = request.form['uniID']
+        user.email = request.form['email']
+        user.office_location = request.form.get('office_location')
+        
+        last_replaced_date = request.form.get('last_replaced_date')
+        if last_replaced_date:
+            user.last_replaced_date = datetime.strptime(last_replaced_date, "%Y-%m-%d")
+        else:
+            user.last_replaced_date = None
+        
+        replacement_cycle_years = request.form.get('replacement_cycle_years')
+        user.replacement_cycle_years = int(replacement_cycle_years) if replacement_cycle_years else None
+        
+        try:
+            db.session.commit()
+            flash('User updated successfully!', 'success')
+            return redirect(url_for('home'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating user: {str(e)}', 'error')
+            
+    return render_template('edit_user.html', user=user)
+
 
 @app.route('/edit_ticket/<int:ticket_id>', methods=['GET', 'POST'])
 def edit_ticket(ticket_id):
