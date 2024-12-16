@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results - University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Admin Page</title>
 </head>
 <body>
     <header>
@@ -21,25 +20,37 @@
             </form>
         </nav>
     </header>
+
     
-    <main>
-        <h2>Search Results for "{{ query }}"</h2>
-        <h3>Users</h3>
-        <ul>
+    <h1>Admin Page</h1>
+    <h2>Delete Users</h2>
+    <ul>
         {% for user in users %}
-            <li><a href="{{ url_for('user_profile', user_id=user.id) }}">{{ user.full_name }} ({{ user.email }})</a></li>
-        {% else %}
-            <li>No users found</li>
+            <li>
+                {{ user.full_name }} ({{ user.email }})
+                <a href="{{ url_for('delete_user', user_id=user.id) }}">Delete</a>
+            </li>
         {% endfor %}
-        </ul>
-        <h3>Computers</h3>
-        <ul>
+    </ul>
+
+    <h2>Delete Computers</h2>
+    <ul>
         {% for computer in computers %}
-            <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model }})</a></li>
-        {% else %}
-            <li>No computers found</li>
+            <li>
+                {{ computer.computer_id }} ({{ computer.model }})
+                <a href="{{ url_for('delete_computer', computer_id=computer.id) }}">Delete</a>
+            </li>
         {% endfor %}
-        </ul>
-    </main>
+    </ul>
+
+    <h2>Delete Tickets</h2>
+    <ul>
+        {% for ticket in tickets %}
+            <li>
+                {{ ticket.issue_summary }} ({{ ticket.status }})
+                <a href="{{ url_for('delete_ticket', ticket_id=ticket.id) }}">Delete</a>
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

@@ -242,6 +242,34 @@ def edit_user(user_id):
             
     return render_template('edit_user.html', user=user)
 
+@app.route('/edit_computer/<int:computer_id>', methods=['GET', 'POST'])
+def edit_computer(computer_id):
+    computer = Computer.query.get_or_404(computer_id)
+    
+    if request.method == 'POST':
+        computer.computer_id = request.form['computer_id']
+        computer.model = request.form['model']
+        computer.assigned_user_id = request.form['user_id']
+        computer.location = request.form['location']
+        computer.room = request.form.get('room')
+        computer.company = request.form.get('company')
+        computer.cpu = request.form.get('cpu')
+        computer.ram = int(request.form.get('ram')) if request.form.get('ram') else None
+        computer.storage = int(request.form.get('storage')) if request.form.get('storage') else None
+        computer.os = request.form.get('os')
+        computer.date_inventoried = datetime.strptime(request.form.get('date_inventoried'), '%Y-%m-%d') if request.form.get('date_inventoried') else None
+        computer.price = float(request.form.get('price')) if request.form.get('price') else None
+        
+        try:
+            db.session.commit()
+            flash('Computer updated successfully!', 'success')
+            return redirect(url_for('home'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating computer: {str(e)}', 'error')
+    
+    users = User.query.all()
+    return render_template('edit_computer.html', computer=computer, users=users)
 
 @app.route('/edit_ticket/<int:ticket_id>', methods=['GET', 'POST'])
 def edit_ticket(ticket_id):
@@ -284,6 +312,34 @@ def search():
     users = User.query.filter(User.full_name.ilike(f'%{query}%') | User.email.ilike(f'%{query}%')).all()
     computers = Computer.query.filter(Computer.computer_id.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, users=users, computers=computers)
+
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+@app.route('/admin/delete_user/<int:user_id>')
+def delete_user(user_id):
+    # Delete user logic here
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/delete_computer/<int:computer_id>')
+def delete_computer(computer_id):
+    # Delete computer logic here
+    computer = Computer.query.get_or_404(computer_id)
+    db.session.delete(computer)
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/admin/delete_ticket/<int:ticket_id>')
+def delete_ticket(ticket_id):
+    # Delete ticket logic here
+    ticket = Ticket.query.get_or_404(ticket_id)
+    db.session.delete(ticket)
+    db.session.commit()
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(debug=True)
