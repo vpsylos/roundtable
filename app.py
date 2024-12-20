@@ -31,42 +31,79 @@ class User(db.Model):
     replacement_cycle_years = db.Column(db.Integer)  # How often a computer is to be replaced in years
     
     # Relationships to computers and tickets
-    computers = db.relationship('Computer', backref='assigned_user', lazy=True)
-    tickets = db.relationship('Ticket', backref='ticket_user', lazy=True)
+    computers = db.relationship('Computer', backref='users_computers', lazy=True)
+    tickets = db.relationship('Ticket', backref='users_tickets', lazy=True)
+
+class Technician(db.Model):
+    __tablename__ = 'technician'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(100), nullable=False)  # Full name of the technician
+    pronouns = db.Column(db.String(20))  # Technician's pronouns
+    email = db.Column(db.String(120), unique=True, nullable=False)  # Email address
+
+# Define the Company model
+class Company(db.Model):
+    __tablename__ = 'company'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+# Define the Model model
+class Model(db.Model):
+    __tablename__ = 'model'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+# Define the CPU model
+class CPU(db.Model):
+    __tablename__ = 'cpu'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+# Define the OS model
+class OS(db.Model):
+    __tablename__ = 'os'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
 
 class Computer(db.Model):
     __tablename__ = 'computer'
     
     id = db.Column(db.Integer, primary_key=True)  # Primary key
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+    company = db.relationship('Company', backref='computers_companies')  # Company of the computer
     computer_id = db.Column(db.String(50), unique=True, nullable=False)  # Unique identifier (serial number)
-    model = db.Column(db.String(100))  # Model of the computer
+    model_id = db.Column(db.Integer, db.ForeignKey('model.id'), nullable=False)
+    model = db.relationship('Model', backref='computers_models')  # Model of the computer
     assigned_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key for user assignment
+    assigned_user = db.relationship('User', backref='assigned_computers', lazy=True)
     location = db.Column(db.String(50))  # Location (office, home, HCS, Recycling Center)
     room = db.Column(db.String(50))  # Room number or identifier
-    company = db.Column(db.String(100))  # Company of the computer
-    cpu = db.Column(db.String(100))  # CPU specifications
+    cpu_id = db.Column(db.Integer, db.ForeignKey('cpu.id'), nullable=False)
+    cpu = db.relationship('CPU', backref='computers_cpus')  # CPU specifications
     ram = db.Column(db.Integer)  # RAM in GB
     storage = db.Column(db.Integer)  # Storage in GB
-    os = db.Column(db.String(100))  # Operating system
+    os_id = db.Column(db.Integer, db.ForeignKey('os.id'), nullable=False)
+    os = db.relationship('OS', backref='computers_oss')  # Operating system
     date_inventoried = db.Column(db.DateTime)  # Date when the computer was inventoried
     price = db.Column(db.Float)  # Price of the computer
-    
-    user = db.relationship('User', backref='assigned_computers', lazy=True)  # Renamed backref to avoid conflict
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for computer association
+    user = db.relationship('User', backref='tickets_users', lazy=True)
     computer_id = db.Column(db.Integer, db.ForeignKey('computer.id'), nullable=True)  # Nullable for user association
+    computer = db.relationship('Computer', backref='tickets_computers', lazy=True)
     issue_summary = db.Column(db.String(200), nullable=False)  # Summary of the issue reported in the ticket
     status = db.Column(db.String(20), default='Open')  # Status of the ticket (e.g., Open, Closed)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp when the ticket was created
     appointment_time = db.Column(db.DateTime)  # Scheduled appointment time for addressing the issue
-
-    # Relationships for ticket associations
-    computer = db.relationship('Computer', backref='computers_tickets', lazy=True)
-    user = db.relationship('User', backref='users_tickets', lazy=True)
+    appointment_length = db.Column(db.Integer, nullable=False)  # in minutes
+    assigned_person_id = db.Column(db.Integer, db.ForeignKey('technician.id'))
+    assigned_person = db.relationship('Technician', backref='tickets_technicians', lazy=True)
+    location = db.Column(db.String(100), nullable=False)  # 'In House', 'At Office', or 'Remote'
 
 
 # Create the database tables
@@ -124,31 +161,57 @@ def add_user():
 def add_computer():
     if request.method == 'POST':
         computer_id = request.form['computer_id']
-        model = request.form['model']
+        model_name = request.form['model']
         user_id = request.form['user_id']
-        
         location = request.form['location']
         room = request.form.get('room')
-        company = request.form.get('company')
-        cpu = request.form.get('cpu')
+        company_name = request.form.get('company')
+        cpu_name = request.form.get('cpu')
         ram = int(request.form.get('ram')) if request.form.get('ram') else None
         storage = int(request.form.get('storage')) if request.form.get('storage') else None
-        os = request.form.get('os')
-        
-        date_inventoried = request.form.get('date_inventoried')
-        
+        os_name = request.form.get('os')
+        date_inventoried = datetime.strptime(request.form.get('date_inventoried'), '%Y-%m-%d') if request.form.get('date_inventoried') else None
         price = float(request.form.get('price')) if request.form.get('price') else None
-        
+
+        # Get or create company
+        company = Company.query.filter_by(name=company_name).first()
+        if not company:
+            company = Company(name=company_name)
+            db.session.add(company)
+            db.session.commit()
+
+        # Get or create model
+        model = Model.query.filter_by(name=model_name).first()
+        if not model:
+            model = Model(name=model_name)
+            db.session.add(model)
+            db.session.commit()
+
+        # Get or create cpu
+        cpu = CPU.query.filter_by(name=cpu_name).first()
+        if not cpu:
+            cpu = CPU(name=cpu_name)
+            db.session.add(cpu)
+            db.session.commit()
+
+        # Get or create os
+        os = OS.query.filter_by(name=os_name).first()
+        if not os:
+            os = OS(name=os_name)
+            db.session.add(os)
+            db.session.commit()
+
+        # Get user
         user = User.query.get(user_id)
-        
         if not user:
             flash('User not found', 'error')
             return redirect(url_for('add_computer'))
-        
+
+        # Create new computer
         new_computer = Computer(
             computer_id=computer_id,
             model=model,
-            assigned_user_id=user_id,
+            assigned_user=user,
             location=location,
             room=room,
             company=company,
@@ -156,22 +219,20 @@ def add_computer():
             ram=ram,
             storage=storage,
             os=os,
-            date_inventoried=datetime.strptime(date_inventoried, '%Y-%m-%d') if date_inventoried else None,
+            date_inventoried=date_inventoried,
             price=price
         )
-        
+
         try:
             db.session.add(new_computer)
             db.session.commit()
             flash('Computer added successfully!', 'success')
             return redirect(url_for('home'))
-        
         except Exception as e:
             db.session.rollback()
             flash(f'Error adding computer: {str(e)}', 'error')
-    
-    users = User.query.all()
-    return render_template('add_computer.html', users=users)
+
+    return render_template('add_computer.html', companies=Company.query.all(), models=Model.query.all(), cpus=CPU.query.all(), oss=OS.query.all(), users=User.query.all())
 
 
 @app.route('/add_ticket', methods=['GET', 'POST'])
@@ -245,21 +306,67 @@ def edit_user(user_id):
 @app.route('/edit_computer/<int:computer_id>', methods=['GET', 'POST'])
 def edit_computer(computer_id):
     computer = Computer.query.get_or_404(computer_id)
-    
+
     if request.method == 'POST':
         computer.computer_id = request.form['computer_id']
-        computer.model = request.form['model']
-        computer.assigned_user_id = request.form['user_id']
-        computer.location = request.form['location']
-        computer.room = request.form.get('room')
-        computer.company = request.form.get('company')
-        computer.cpu = request.form.get('cpu')
-        computer.ram = int(request.form.get('ram')) if request.form.get('ram') else None
-        computer.storage = int(request.form.get('storage')) if request.form.get('storage') else None
-        computer.os = request.form.get('os')
-        computer.date_inventoried = datetime.strptime(request.form.get('date_inventoried'), '%Y-%m-%d') if request.form.get('date_inventoried') else None
-        computer.price = float(request.form.get('price')) if request.form.get('price') else None
-        
+        model_name = request.form['model']
+        user_id = request.form['user_id']
+        location = request.form['location']
+        room = request.form.get('room')
+        company_name = request.form.get('company')
+        cpu_name = request.form.get('cpu')
+        ram = int(request.form.get('ram')) if request.form.get('ram') else None
+        storage = int(request.form.get('storage')) if request.form.get('storage') else None
+        os_name = request.form.get('os')
+        date_inventoried = datetime.strptime(request.form.get('date_inventoried'), '%Y-%m-%d') if request.form.get('date_inventoried') else None
+        price = float(request.form.get('price')) if request.form.get('price') else None
+
+        # Get or create company
+        company = Company.query.filter_by(name=company_name).first()
+        if not company:
+            company = Company(name=company_name)
+            db.session.add(company)
+            db.session.commit()
+        computer.company = company
+
+        # Get or create model
+        model = Model.query.filter_by(name=model_name).first()
+        if not model:
+            model = Model(name=model_name)
+            db.session.add(model)
+            db.session.commit()
+        computer.model = model
+
+        # Get or create cpu
+        cpu = CPU.query.filter_by(name=cpu_name).first()
+        if not cpu:
+            cpu = CPU(name=cpu_name)
+            db.session.add(cpu)
+            db.session.commit()
+        computer.cpu = cpu
+
+        # Get or create os
+        os = OS.query.filter_by(name=os_name).first()
+        if not os:
+            os = OS(name=os_name)
+            db.session.add(os)
+            db.session.commit()
+        computer.os = os
+
+        # Get user
+        user = User.query.get(user_id)
+        if not user:
+            flash('User not found', 'error')
+            return redirect(url_for('edit_computer', computer_id=computer_id))
+        computer.assigned_user = user
+
+        computer.location = location
+        computer.room = room
+        computer.ram = ram
+        computer.storage = storage
+        computer.date_inventoried = date_inventoried
+        computer.price = price
+
         try:
             db.session.commit()
             flash('Computer updated successfully!', 'success')
@@ -267,7 +374,7 @@ def edit_computer(computer_id):
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating computer: {str(e)}', 'error')
-    
+
     users = User.query.all()
     return render_template('edit_computer.html', computer=computer, users=users)
 
@@ -344,14 +451,101 @@ def admin():
                 for ticket in tickets_to_delete:
                     db.session.delete(ticket)
             db.session.delete(computer)
-        elif ticket_id:
-            ticket = Ticket.query.get_or_404(ticket_id)
-            db.session.delete(ticket)
         
         db.session.commit()
         return redirect(url_for('admin'))
     
     return render_template('admin.html', data={'users': users, 'computers': computers, 'tickets': tickets})
+
+@app.route('/admin/edit_dropdown_menus', methods=['GET', 'POST'])
+def edit_dropdown_menus():
+    if request.method == 'POST':
+        # Get the form data
+        companies = request.form.getlist('companies')
+        models = request.form.getlist('models')
+        cpus = request.form.getlist('cpus')
+        oss = request.form.getlist('oss')
+
+        # Add any new items
+        if 'add_company' in request.form:
+            new_company = request.form.get('new_company')
+            if new_company:
+                company = Company.query.filter_by(name=new_company).first()
+                if not company:
+                    company = Company(name=new_company)
+                    db.session.add(company)
+                    db.session.commit()
+
+        if 'add_model' in request.form:
+            new_model = request.form.get('new_model')
+            if new_model:
+                model = Model.query.filter_by(name=new_model).first()
+                if not model:
+                    model = Model(name=new_model)
+                    db.session.add(model)
+                    db.session.commit()
+
+        if 'add_cpu' in request.form:
+            new_cpu = request.form.get('new_cpu')
+            if new_cpu:
+                cpu = CPU.query.filter_by(name=new_cpu).first()
+                if not cpu:
+                    cpu = CPU(name=new_cpu)
+                    db.session.add(cpu)
+                    db.session.commit()
+
+        if 'add_os' in request.form:
+            new_os = request.form.get('new_os')
+            if new_os:
+                os = OS.query.filter_by(name=new_os).first()
+                if not os:
+                    os = OS(name=new_os)
+                    db.session.add(os)
+                    db.session.commit()
+
+        if 'delete_company' in request.form:
+            delete_company = request.form.get('delete_company')
+            if delete_company:
+                company = Company.query.filter_by(name=delete_company).first()
+                if company:
+                    db.session.delete(company)
+                    db.session.commit()
+
+        if 'delete_model' in request.form:
+            delete_model = request.form.get('delete_model')
+            if delete_model:
+                model = Model.query.filter_by(name=delete_model).first()
+                if model:
+                    db.session.delete(model)
+                    db.session.commit()
+
+        if 'delete_cpu' in request.form:
+            delete_cpu = request.form.get('delete_cpu')
+            if delete_cpu:
+                cpu = CPU.query.filter_by(name=delete_cpu).first()
+                if cpu:
+                    db.session.delete(cpu)
+                    db.session.commit()
+
+        if 'delete_os' in request.form:
+            delete_os = request.form.get('delete_os')
+            if delete_os:
+                os = OS.query.filter_by(name=delete_os).first()
+                if os:
+                    db.session.delete(os)
+                    db.session.commit()
+
+    # Get the current dropdown menu items
+    companies = Company.query.all()
+    models = Model.query.all()
+    cpus = CPU.query.all()
+    oss = OS.query.all()
+
+    return render_template('admin_edit_dropdown_menus.html', 
+                           companies=companies, 
+                           models=models, 
+                           cpus=cpus, 
+                           oss=oss)
 
 if __name__ == '__main__':
     app.run(debug=True)

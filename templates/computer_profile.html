@@ -25,7 +25,7 @@
     <main>
         <h2>Computer Details</h2>
         <p><strong>Computer ID:</strong> {{ computer.computer_id }}</p>
-        <p><strong>Model:</strong> {{ computer.model }}</p>
+        <p><strong>Model:</strong> {{ computer.model.name }}</p>
 
         <h3>Assigned User</h3>
         {% if computer.assigned_user %}

@@ -46,7 +46,7 @@
         <select id="computer_id" name="computer_id">
             {% if data.computers %}
                 {% for computer in data.computers %}
-                    <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model }})</option>
+                    <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
                 {% endfor %}
             {% else %}
                 <option value="">No computers found</option>
@@ -55,5 +55,11 @@
         <br>
         <input type="submit" value="Delete Computer and Associated Tickets" name="delete_computer">
     </form>
+
+    <h2>Edit Dropdown Menus</h2>
+    <p>
+        <a href="{{ url_for('edit_dropdown_menus') }}">Edit Dropdown Menus</a>
+    </p>
+    
 </body>
 </html>

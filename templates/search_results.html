@@ -35,7 +35,7 @@
         <h3>Computers</h3>
         <ul>
         {% for computer in computers %}
-            <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model }})</a></li>
+            <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model.name }})</a></li>
         {% else %}
             <li>No computers found</li>
         {% endfor %}

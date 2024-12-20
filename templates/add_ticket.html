@@ -21,7 +21,7 @@
             </form>
         </nav>
     </header>
-    
+
     <h2>Add New Ticket</h2>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,6 +57,25 @@
         
         <label for="appointment_time">Appointment Time:</label>
         <input type="time" id="appointment_time" name="appointment_time" required>
+
+        <label for="appointment_length">Appointment Length:</label>
+        <input type="number" id="appointment_length" name="appointment_length" required>
+
+        <label for="assigned_person_id">Assigned Person:</label>
+        <select id="assigned_person_id" name="assigned_person_id">
+            <option value="">Select an assigned person</option>
+            {% for technician in technicians %}
+                <option value="{{ technician.id }}">{{ technician.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="location">Location:</label>
+        <select id="location" name="location" required>
+            <option value="">Select a location</option>
+            <option value="In House">In House</option>
+            <option value="At Office">At Office</option>
+            <option value="Remote">Remote</option>
+        </select>
 
         <label for="status">Status:</label>
         <select id="status" name="status" required>

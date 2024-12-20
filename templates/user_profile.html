@@ -33,7 +33,7 @@
         {% if user.computers %}
             <ul>
                 {% for computer in user.computers %}
-                    <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model }})</a></li>
+                    <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model.name }})</a></li>
                 {% endfor %}
             </ul>
         {% else %}
