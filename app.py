@@ -244,6 +244,9 @@ def add_ticket():
         appointment_date = request.form['appointment_date']
         appointment_time = request.form['appointment_time']
         status = request.form['status']
+        appointment_length = request.form['appointment_length']  # Added this line
+        assigned_person_id = request.form['assigned_person_id']  # Added this line
+        location = request.form['location']  # Added this line
         
         # Combine date and time
         appointment_datetime = datetime.strptime(f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M")
@@ -253,6 +256,9 @@ def add_ticket():
             user_id=user_id,
             computer_id=computer_id,
             appointment_time=appointment_datetime,
+            appointment_length=appointment_length,  # Added this line
+            assigned_person_id=assigned_person_id,  # Added this line
+            location=location,  # Added this line
             status=status
         )
         
@@ -267,7 +273,8 @@ def add_ticket():
     
     users = User.query.all()
     computers = Computer.query.all()
-    return render_template('add_ticket.html', users=users, computers=computers)
+    technicians = Technician.query.all()
+    return render_template('add_ticket.html', users=users, computers=computers, technicians=technicians)
 
 @app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
 def edit_user(user_id):
@@ -389,7 +396,10 @@ def edit_ticket(ticket_id):
         appointment_date = request.form['appointment_date']
         appointment_time = request.form['appointment_time']
         ticket.appointment_time = datetime.strptime(f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M")
+        ticket.appointment_length = request.form['appointment_length']
         ticket.status = request.form['status']
+        ticket.assigned_person_id = request.form['assigned_person_id']
+        ticket.location = request.form['location']
         
         try:
             db.session.commit()
@@ -401,7 +411,8 @@ def edit_ticket(ticket_id):
     
     users = User.query.all()
     computers = Computer.query.all()
-    return render_template('edit_ticket.html', ticket=ticket, users=users, computers=computers)
+    technicians = Technician.query.all()
+    return render_template('edit_ticket.html', ticket=ticket, users=users, computers=computers, technicians=technicians)
 
 @app.route('/user/<int:user_id>')
 def user_profile(user_id):
@@ -546,6 +557,30 @@ def edit_dropdown_menus():
                            models=models, 
                            cpus=cpus, 
                            oss=oss)
+
+@app.route('/admin/edit_technicians', methods=['GET', 'POST'])
+def edit_technicians():
+    if request.method == 'POST':
+        if 'add_technician' in request.form:
+            full_name = request.form.get('full_name')
+            pronouns = request.form.get('pronouns')
+            email = request.form.get('email')
+            if full_name and email:
+                technician = Technician.query.filter_by(email=email).first()
+                if not technician:
+                    technician = Technician(full_name=full_name, pronouns=pronouns, email=email)
+                    db.session.add(technician)
+                    db.session.commit()
+        elif 'delete_technician_submit' in request.form:
+            delete_technician = request.form.get('delete_technician')
+            if delete_technician:
+                technician = Technician.query.get(delete_technician)
+                if technician:
+                    db.session.delete(technician)
+                    db.session.commit()
+
+    technicians = Technician.query.all()
+    return render_template('admin_edit_technicians.html', technicians=technicians)
 
 if __name__ == '__main__':
     app.run(debug=True)

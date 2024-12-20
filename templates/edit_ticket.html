@@ -50,7 +50,7 @@
             <option value="">Select a computer</option>
             {% for computer in computers %}
                 <option value="{{ computer.id }}" {% if computer.id == ticket.computer_id %}selected{% endif %}>
-                    {{ computer.computer_id }} ({{ computer.model }})
+                    {{ computer.computer_id }} ({{ computer.model.name }})
                 </option>
             {% endfor %}
         </select>
@@ -68,7 +68,7 @@
         <select id="assigned_person_id" name="assigned_person_id">
             <option value="">Select an assigned person</option>
             {% for technician in technicians %}
-                <option value="{{ technician.id }}" {% if technician.id == ticket.assigned_person_id %}selected{% endif %}>{{ technician.name }}</option>
+                <option value="{{ technician.id }}" {% if technician.id == ticket.assigned_person_id %}selected{% endif %}>{{ technician.full_name }} ({{ technician.email }})</option>
             {% endfor %}
         </select>
         

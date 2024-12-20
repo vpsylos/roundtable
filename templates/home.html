@@ -21,6 +21,14 @@
             </form>
         </nav>
     </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     
     <h2>Open Appointments</h2>
     <table>
@@ -31,6 +39,7 @@
                 <th>User Name</th>
                 <th>Computer Model</th> <!-- Displaying model instead of ID -->
                 <th>Issue Summary</th>
+                <th>Assigned Person</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -42,13 +51,14 @@
                 <td>{{ ticket.appointment_time.strftime('%H:%M') }}</td>
 
                 <!-- Display user name -->
-                <td><a href="{{ url_for('user_profile', user_id=ticket.ticket_user.id) }}">{{ ticket.user.full_name }}</a></td>
+                <td><a href="{{ url_for('user_profile', user_id=ticket.user.id) }}">{{ ticket.user.full_name }}</a></td>
 
                 <!-- Display computer model -->
-                <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model if ticket.computer else 'N/A' }}</a></td>
+                <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model.name if ticket.computer else 'N/A' }}</a></td>
 
                 <!-- Display other ticket details -->
                 <td>{{ ticket.issue_summary }}</td>
+                <td>{{ ticket.assigned_person.full_name }}</td>
                 <td>{{ ticket.status }}</td>
                 <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
             </tr>

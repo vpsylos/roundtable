@@ -65,7 +65,7 @@
         <select id="assigned_person_id" name="assigned_person_id">
             <option value="">Select an assigned person</option>
             {% for technician in technicians %}
-                <option value="{{ technician.id }}">{{ technician.name }}</option>
+                <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
             {% endfor %}
         </select>
 
