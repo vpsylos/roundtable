@@ -48,7 +48,7 @@
         <select id="computer_id" name="computer_id">
             <option value="">Select a computer</option>
             {% for computer in computers %}
-                <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model }})</option>
+                <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
             {% endfor %}
         </select>
         
