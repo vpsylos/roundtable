@@ -119,16 +119,9 @@ class Ticket(db.Model):
     assigned_person = db.relationship('Technician', backref='tickets_technicians', lazy=True)
     location = db.Column(db.String(100), nullable=False)  # 'In House', 'At Office', or 'Remote'
 
-def create_admin_user():
-    if not TechnicianLogIn.query.first():
-        admin = TechnicianLogIn(username='admin', password=generate_password_hash('admin'), role='Admin')
-        db.session.add(admin)
-        db.session.commit()
-
 # Create the database tables
 with app.app_context():
     db.create_all()
-    create_admin_user()
 
 # Handle logging in
 login_manager = LoginManager(app)
@@ -139,9 +132,13 @@ def load_technician(technician_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def technician_login():
+    if not TechnicianLogIn.query.first():
+        return redirect(url_for('create_first_admin'))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
         technician = TechnicianLogIn.query.filter_by(username=username).first()
         if technician and check_password_hash(technician.password, password):
             login_user(technician)
@@ -152,6 +149,19 @@ def technician_login():
 def logout():
     logout_user()
     return redirect(url_for('technician_login'))
+
+@app.route('/create_first_admin', methods=['GET', 'POST'])
+def create_first_admin():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        new_admin = TechnicianLogIn(username=username, password=generate_password_hash(password), role='Admin')
+        db.session.add(new_admin)
+        db.session.commit()
+        
+        return redirect(url_for('technician_login'))
+    return render_template('create_first_admin.html')
 
 # Decorators to ensure a user is logged in, and is an admin
 def login_required(f):
