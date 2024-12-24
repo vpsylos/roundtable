@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import logging
 import os
@@ -41,6 +44,17 @@ class Technician(db.Model):
     full_name = db.Column(db.String(100), nullable=False)  # Full name of the technician
     pronouns = db.Column(db.String(20))  # Technician's pronouns
     email = db.Column(db.String(120), unique=True, nullable=False)  # Email address
+
+class TechnicianLogIn(UserMixin, db.Model):
+    __tablename__ = 'technician_login'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.Enum('Technician', 'Admin'), nullable=False)
+
+    def is_admin(self):
+        return self.role == 'Admin'
 
 # Define the Company model
 class Company(db.Model):
@@ -105,17 +119,67 @@ class Ticket(db.Model):
     assigned_person = db.relationship('Technician', backref='tickets_technicians', lazy=True)
     location = db.Column(db.String(100), nullable=False)  # 'In House', 'At Office', or 'Remote'
 
+def create_admin_user():
+    if not TechnicianLogIn.query.first():
+        admin = TechnicianLogIn(username='admin', password=generate_password_hash('admin'), role='Admin')
+        db.session.add(admin)
+        db.session.commit()
 
 # Create the database tables
 with app.app_context():
     db.create_all()
+    create_admin_user()
+
+# Handle logging in
+login_manager = LoginManager(app)
+
+@login_manager.user_loader
+def load_technician(technician_id):
+    return TechnicianLogIn.query.get(technician_id)
+
+@app.route('/login', methods=['GET', 'POST'])
+def technician_login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        technician = TechnicianLogIn.query.filter_by(username=username).first()
+        if technician and check_password_hash(technician.password, password):
+            login_user(technician)
+            return redirect(url_for('home'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('technician_login'))
+
+# Decorators to ensure a user is logged in, and is an admin
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('technician_login'))
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated and current_user.role == 'Admin':
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+    return decorated_function
 
 @app.route('/')
+@login_required
 def home():
     open_tickets = Ticket.query.filter(Ticket.status != 'Closed').order_by(Ticket.appointment_time).all()
     return render_template('home.html', tickets=open_tickets)
 
 @app.route('/add_user', methods=['GET', 'POST'])
+@login_required
 def add_user():
     if request.method == 'POST':
         # Capture all required fields from the form
@@ -158,6 +222,7 @@ def add_user():
     return render_template('add_user.html')
 
 @app.route('/add_computer', methods=['GET', 'POST'])
+@login_required
 def add_computer():
     if request.method == 'POST':
         computer_id = request.form['computer_id']
@@ -236,6 +301,7 @@ def add_computer():
 
 
 @app.route('/add_ticket', methods=['GET', 'POST'])
+@login_required
 def add_ticket():
     if request.method == 'POST':
         issue_summary = request.form['issue_summary']
@@ -277,6 +343,7 @@ def add_ticket():
     return render_template('add_ticket.html', users=users, computers=computers, technicians=technicians)
 
 @app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
+@login_required
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
 
@@ -311,6 +378,7 @@ def edit_user(user_id):
     return render_template('edit_user.html', user=user)
 
 @app.route('/edit_computer/<int:computer_id>', methods=['GET', 'POST'])
+@login_required
 def edit_computer(computer_id):
     computer = Computer.query.get_or_404(computer_id)
 
@@ -386,6 +454,7 @@ def edit_computer(computer_id):
     return render_template('edit_computer.html', computer=computer, users=users)
 
 @app.route('/edit_ticket/<int:ticket_id>', methods=['GET', 'POST'])
+@login_required
 def edit_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     
@@ -415,16 +484,19 @@ def edit_ticket(ticket_id):
     return render_template('edit_ticket.html', ticket=ticket, users=users, computers=computers, technicians=technicians)
 
 @app.route('/user/<int:user_id>')
+@login_required
 def user_profile(user_id):
     user = User.query.get_or_404(user_id)
     return render_template('user_profile.html', user=user)
 
 @app.route('/computer/<int:computer_id>')
+@login_required
 def computer_profile(computer_id):
     computer = Computer.query.get_or_404(computer_id)
     return render_template('computer_profile.html', computer=computer)
 
 @app.route('/search', methods=['GET'])
+@login_required
 def search():
     query = request.args.get('q', '')
     users = User.query.filter(User.full_name.ilike(f'%{query}%') | User.email.ilike(f'%{query}%')).all()
@@ -432,6 +504,7 @@ def search():
     return render_template('search_results.html', query=query, users=users, computers=computers)
 
 @app.route('/admin', methods=['GET', 'POST'])
+@admin_required
 def admin():
     users = User.query.all()
     computers = Computer.query.all()
@@ -469,6 +542,7 @@ def admin():
     return render_template('admin.html', data={'users': users, 'computers': computers, 'tickets': tickets})
 
 @app.route('/admin/edit_dropdown_menus', methods=['GET', 'POST'])
+@admin_required
 def edit_dropdown_menus():
     if request.method == 'POST':
         # Get the form data
@@ -559,6 +633,7 @@ def edit_dropdown_menus():
                            oss=oss)
 
 @app.route('/admin/edit_technicians', methods=['GET', 'POST'])
+@admin_required
 def edit_technicians():
     if request.method == 'POST':
         if 'add_technician' in request.form:
@@ -583,4 +658,5 @@ def edit_technicians():
     return render_template('admin_edit_technicians.html', technicians=technicians)
 
 if __name__ == '__main__':
+    create_admin_user()
     app.run(debug=True)
