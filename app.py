@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
+from flask_migrate import Migrate
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -15,6 +16,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///techsupport.db'
 db = SQLAlchemy(app)
 app.logger.setLevel(logging.DEBUG)
+migrate = Migrate(app, db)
 
 # Database Models
 class User(db.Model):
@@ -44,11 +46,13 @@ class Technician(db.Model):
     full_name = db.Column(db.String(100), nullable=False)  # Full name of the technician
     pronouns = db.Column(db.String(20))  # Technician's pronouns
     email = db.Column(db.String(120), unique=True, nullable=False)  # Email address
+    role = db.Column(db.Enum('Technician', 'Admin'), nullable=False)  # Role of the technician
 
 class TechnicianLogIn(UserMixin, db.Model):
     __tablename__ = 'technician_login'
     
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
     role = db.Column(db.Enum('Technician', 'Admin'), nullable=False)
@@ -153,15 +157,40 @@ def logout():
 @app.route('/create_first_admin', methods=['GET', 'POST'])
 def create_first_admin():
     if request.method == 'POST':
+        full_name = request.form['full_name']
+        pronouns = request.form['pronouns']
+        email = request.form['email']
         username = request.form['username']
         password = request.form['password']
         
-        new_admin = TechnicianLogIn(username=username, password=generate_password_hash(password), role='Admin')
+        new_admin_login = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role='Admin')
+        new_admin = Technician(full_name=full_name, pronouns=pronouns, email=email, role='Admin')
         db.session.add(new_admin)
+        db.session.add(new_admin_login)
         db.session.commit()
         
         return redirect(url_for('technician_login'))
     return render_template('create_first_admin.html')
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+        
+        technician = Technician.query.filter_by(email=email).first()
+        if technician:
+            print(technician)
+            role = getattr(technician, 'role')
+            new_user = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role=role)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('technician_login'))
+        else:
+            return redirect(url_for('create_account'))
+        
+    return render_template('create_account.html')
 
 # Decorators to ensure a user is logged in, and is an admin
 def login_required(f):
@@ -178,8 +207,11 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         if current_user.is_authenticated and current_user.role == 'Admin':
             return f(*args, **kwargs)
+        elif current_user.is_authenticated:
+            flash('You do not have permission to access this page.', 'error')
+            return redirect(url_for('home'))
         else:
-            return redirect(url_for('login'))
+            return redirect(url_for('technician_login'))
     return decorated_function
 
 @app.route('/')
@@ -647,21 +679,28 @@ def edit_dropdown_menus():
 def edit_technicians():
     if request.method == 'POST':
         if 'add_technician' in request.form:
-            full_name = request.form.get('full_name')
-            pronouns = request.form.get('pronouns')
-            email = request.form.get('email')
+            full_name = request.form['full_name']
+            pronouns = request.form['pronouns']
+            email = request.form['email']
+            role = request.form['role']
+            if role not in ['Admin', 'Technician']:
+                flash('Please select an appropriate role for the technician.', 'error')
+                return redirect(url_for('edit_technicians'))
             if full_name and email:
                 technician = Technician.query.filter_by(email=email).first()
                 if not technician:
-                    technician = Technician(full_name=full_name, pronouns=pronouns, email=email)
+                    technician = Technician(full_name=full_name, pronouns=pronouns, email=email, role=role)
+                    print(technician.role)
                     db.session.add(technician)
                     db.session.commit()
         elif 'delete_technician_submit' in request.form:
             delete_technician = request.form.get('delete_technician')
             if delete_technician:
                 technician = Technician.query.get(delete_technician)
+                technician_login = TechnicianLogIn.query.filter_by(email=technician.email).first()
                 if technician:
                     db.session.delete(technician)
+                    db.session.delete(technician_login)
                     db.session.commit()
 
     technicians = Technician.query.all()
