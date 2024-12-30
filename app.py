@@ -700,11 +700,12 @@ def edit_technicians():
                 technician_login = TechnicianLogIn.query.filter_by(email=technician.email).first()
                 if technician:
                     db.session.delete(technician)
+                if technician_login:
                     db.session.delete(technician_login)
                     db.session.commit()
 
     technicians = Technician.query.all()
-    return render_template('admin_edit_technicians.html', technicians=technicians)
+    return render_template('admin_edit_technicians.html', technicians=technicians, current_user=current_user)
 
 if __name__ == '__main__':
     create_admin_user()

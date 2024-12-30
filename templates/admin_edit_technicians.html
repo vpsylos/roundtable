@@ -54,7 +54,9 @@
         <select id="delete_technician" name="delete_technician">
             <option value="">Select a technician to delete</option>
             {% for technician in technicians %}
-                <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
+                {% if technician.email != current_user.email %}
+                    <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
+                {% endif %}
             {% endfor %}
         </select>
         <input type="submit" value="Delete Technician" name="delete_technician_submit">
