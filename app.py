@@ -130,68 +130,6 @@ with app.app_context():
 # Handle logging in
 login_manager = LoginManager(app)
 
-@login_manager.user_loader
-def load_technician(technician_id):
-    return TechnicianLogIn.query.get(technician_id)
-
-@app.route('/login', methods=['GET', 'POST'])
-def technician_login():
-    if not TechnicianLogIn.query.first():
-        return redirect(url_for('create_first_admin'))
-
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        technician = TechnicianLogIn.query.filter_by(username=username).first()
-        if technician and check_password_hash(technician.password, password):
-            login_user(technician)
-            return redirect(url_for('home'))
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('technician_login'))
-
-@app.route('/create_first_admin', methods=['GET', 'POST'])
-def create_first_admin():
-    if request.method == 'POST':
-        full_name = request.form['full_name']
-        pronouns = request.form['pronouns']
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
-        
-        new_admin_login = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role='Admin')
-        new_admin = Technician(full_name=full_name, pronouns=pronouns, email=email, role='Admin')
-        db.session.add(new_admin)
-        db.session.add(new_admin_login)
-        db.session.commit()
-        
-        return redirect(url_for('technician_login'))
-    return render_template('create_first_admin.html')
-
-@app.route('/create_account', methods=['GET', 'POST'])
-def create_account():
-    if request.method == 'POST':
-        email = request.form['email']
-        username = request.form['username']
-        password = request.form['password']
-        
-        technician = Technician.query.filter_by(email=email).first()
-        if technician:
-            print(technician)
-            role = getattr(technician, 'role')
-            new_user = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role=role)
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect(url_for('technician_login'))
-        else:
-            return redirect(url_for('create_account'))
-        
-    return render_template('create_account.html')
-
 # Decorators to ensure a user is logged in, and is an admin
 def login_required(f):
     @wraps(f)
@@ -213,6 +151,80 @@ def admin_required(f):
         else:
             return redirect(url_for('technician_login'))
     return decorated_function
+
+def already_logged_in(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
+        else:
+            return f(*args, **kwargs)
+    return decorated_function
+
+@login_manager.user_loader
+def load_technician(technician_id):
+    return TechnicianLogIn.query.get(technician_id)
+
+@app.route('/login', methods=['GET', 'POST'])
+@already_logged_in
+def technician_login():
+    if not TechnicianLogIn.query.first():
+        return redirect(url_for('create_first_admin'))
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        technician = TechnicianLogIn.query.filter_by(username=username).first()
+        if technician and check_password_hash(technician.password, password):
+            login_user(technician)
+            return redirect(url_for('home'))
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('technician_login'))
+
+@app.route('/create_first_admin', methods=['GET', 'POST'])
+@already_logged_in
+def create_first_admin():
+    if request.method == 'POST':
+        full_name = request.form['full_name']
+        pronouns = request.form['pronouns']
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+        
+        new_admin_login = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role='Admin')
+        new_admin = Technician(full_name=full_name, pronouns=pronouns, email=email, role='Admin')
+        db.session.add(new_admin)
+        db.session.add(new_admin_login)
+        db.session.commit()
+        
+        return redirect(url_for('technician_login'))
+    return render_template('create_first_admin.html')
+
+@app.route('/create_account', methods=['GET', 'POST'])
+@already_logged_in
+def create_account():
+    if request.method == 'POST':
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+        
+        technician = Technician.query.filter_by(email=email).first()
+        if technician:
+            print(technician)
+            role = getattr(technician, 'role')
+            new_user = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role=role)
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('technician_login'))
+        else:
+            return redirect(url_for('create_account'))
+        
+    return render_template('create_account.html')
 
 @app.route('/')
 @login_required
