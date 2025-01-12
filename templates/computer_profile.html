@@ -23,6 +23,14 @@
         </nav>
     </header>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <main>
         <h2>Computer Details</h2>
         <p><strong>Computer ID:</strong> {{ computer.computer_id }}</p>

@@ -25,6 +25,13 @@
 
     <main>
         <h2>{{ user.full_name }}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <p><strong>Pronouns:</strong> {{ user.pronouns }}</p>
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>Department:</strong> {{ user.department }}</p>
