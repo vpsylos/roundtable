@@ -8,32 +8,34 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <form method="post">
-        <h2>Login</h2>
-        <label for="full_name">Full Name:</label>
-        <input type="text" name="full_name" required>
-        <br>
-        <label for="pronouns">Pronouns:</label>
-        <input type="text" name="pronouns" required>
-        <br>
-        <label for="email">E-mail:</label>
-        <input type="email" name="email" required>
-        <br>
-        <label for="username">Username:</label>
-        <input type="text" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" name="password" required>
-        <br>
-        <input type="submit" value="Login">
-    </form>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            <h2>Login</h2>
+            <label for="full_name">Full Name:</label>
+            <input type="text" name="full_name" required>
+            <br>
+            <label for="pronouns">Pronouns:</label>
+            <input type="text" name="pronouns" required>
+            <br>
+            <label for="email">E-mail:</label>
+            <input type="email" name="email" required>
+            <br>
+            <label for="username">Username:</label>
+            <input type="text" name="username" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
+            <br>
+            <input type="submit" value="Login">
+        </form>
+    </main>
 </body>
 </html>

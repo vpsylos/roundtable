@@ -23,96 +23,97 @@
             </form>
         </nav>
     </header>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <form method="POST">
+            <h2>Companies</h2>
+            <ul>
+                {% for company in companies %}
+                    <li>{{ company.name }}</li>
+                {% endfor %}
 
-    <form method="POST">
-        <h2>Companies</h2>
-        <ul>
-            {% for company in companies %}
-                <li>{{ company.name }}</li>
-            {% endfor %}
+            </ul>
 
-        </ul>
+            <h2>Add New Company:</h2>
+            <input type="text" id="new_company" name="new_company">
+            <input type="submit" value="Add Company" name="add_company">
 
-        <h2>Add New Company:</h2>
-        <input type="text" id="new_company" name="new_company">
-        <input type="submit" value="Add Company" name="add_company">
+            <h2>Delete Company:</h2>
+            <select id="delete_company" name="delete_company">
+                <option value="">Select a company</option>
+                {% for company in companies %}
+                    <option value="{{ company.name }}">{{ company.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Delete Company" name="delete_company">
 
-        <h2>Delete Company:</h2>
-        <select id="delete_company" name="delete_company">
-            <option value="">Select a company</option>
-            {% for company in companies %}
-                <option value="{{ company.name }}">{{ company.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Delete Company" name="delete_company">
+            <h2>Models</h2>
+            <ul>
+                {% for model in models %}
+                    <li>{{ model.name }}</li>
+                {% endfor %}
+            </ul>
 
-        <h2>Models</h2>
-        <ul>
-            {% for model in models %}
-                <li>{{ model.name }}</li>
-            {% endfor %}
-        </ul>
+            <h2>Add New Model:</h2>
+            <input type="text" id="new_model" name="new_model">
+            <input type="submit" value="Add Model" name="add_model">
 
-        <h2>Add New Model:</h2>
-        <input type="text" id="new_model" name="new_model">
-        <input type="submit" value="Add Model" name="add_model">
+            <h2>Delete Model:</h2>
+            <select id="delete_model" name="delete_model">
+                <option value="">Select a model</option>
+                {% for model in models %}
+                    <option value="{{ model.name }}">{{ model.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Delete Model" name="delete_model">
 
-        <h2>Delete Model:</h2>
-        <select id="delete_model" name="delete_model">
-            <option value="">Select a model</option>
-            {% for model in models %}
-                <option value="{{ model.name }}">{{ model.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Delete Model" name="delete_model">
+            <h2>CPU</h2>
+            <ul>
+                {% for cpu in cpus %}
+                    <li>{{ cpu.name }}
+                {% endfor %}
+            </ul>
 
-        <h2>CPU</h2>
-        <ul>
-            {% for cpu in cpus %}
-                <li>{{ cpu.name }}
-            {% endfor %}
-        </ul>
+            <h2>Add New CPU:</h2>
+            <input type="text" id="new_cpu" name="new_cpu">
+            <input type="submit" value="Add CPU" name="add_cpu">
 
-        <h2>Add New CPU:</h2>
-        <input type="text" id="new_cpu" name="new_cpu">
-        <input type="submit" value="Add CPU" name="add_cpu">
+            <h2>Delete CPU:</h2>
+            <select id="delete_cpu" name="delete_cpu">
+                <option value="">Select a CPU</option>
+                {% for cpu in cpus %}
+                    <option value="{{ cpu.name }}">{{ cpu.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Delete CPU" name="delete_cpu">
 
-        <h2>Delete CPU:</h2>
-        <select id="delete_cpu" name="delete_cpu">
-            <option value="">Select a CPU</option>
-            {% for cpu in cpus %}
-                <option value="{{ cpu.name }}">{{ cpu.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Delete CPU" name="delete_cpu">
+            <h2>OS</h2>
+            <ul>
+                {% for os in oss %}
+                    <li>{{ os.name }}</li>
+                {% endfor %}
+            </ul>
 
-        <h2>OS</h2>
-        <ul>
-            {% for os in oss %}
-                <li>{{ os.name }}</li>
-            {% endfor %}
-        </ul>
+            <h2>Add New OS:</h2>
+            <input type="text" id="new_os" name="new_os">
+            <input type="submit" value="Add Operating System" name="add_os">
 
-        <h2>Add New OS:</h2>
-        <input type="text" id="new_os" name="new_os">
-        <input type="submit" value="Add Operating System" name="add_os">
-
-        <h2>Delete OS:</h2>
-        <select id="delete_os" name="delete_os">
-            <option value="">Select an OS</option>
-            {% for os in oss %}
-                <option value="{{ os.name }}">{{ os.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Delete OS" name="delete_os">
-    </form>
+            <h2>Delete OS:</h2>
+            <select id="delete_os" name="delete_os">
+                <option value="">Select an OS</option>
+                {% for os in oss %}
+                    <option value="{{ os.name }}">{{ os.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Delete OS" name="delete_os">
+        </form>
+    </main>
 </body>
 </html>

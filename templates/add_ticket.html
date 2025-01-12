@@ -22,71 +22,72 @@
             </form>
         </nav>
     </header>
-
-    <h2>Add New Ticket</h2>
+    <main>
+        <h2>Add New Ticket</h2>
     
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <label for="issue_summary">Issue Summary:</label>
+            <input type="text" id="issue_summary" name="issue_summary" required>
+            
+            <label for="user_id">User:</label>
+            <select id="user_id" name="user_id" required>
+                <option value="">Select a user</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.full_name }} ({{ user.email }})</option>
+                {% endfor %}
+            </select>
+            
+            <label for="computer_id">Computer (Optional):</label>
+            <select id="computer_id" name="computer_id">
+                <option value="">Select a computer</option>
+                {% for computer in computers %}
+                    <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
+                {% endfor %}
+            </select>
+            
+            <label for="appointment_date">Appointment Date:</label>
+            <input type="date" id="appointment_date" name="appointment_date" required>
+            
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="time" id="appointment_time" name="appointment_time" required>
     
-    <form method="POST">
-        <label for="issue_summary">Issue Summary:</label>
-        <input type="text" id="issue_summary" name="issue_summary" required>
-        
-        <label for="user_id">User:</label>
-        <select id="user_id" name="user_id" required>
-            <option value="">Select a user</option>
-            {% for user in users %}
-                <option value="{{ user.id }}">{{ user.full_name }} ({{ user.email }})</option>
-            {% endfor %}
-        </select>
-        
-        <label for="computer_id">Computer (Optional):</label>
-        <select id="computer_id" name="computer_id">
-            <option value="">Select a computer</option>
-            {% for computer in computers %}
-                <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
-            {% endfor %}
-        </select>
-        
-        <label for="appointment_date">Appointment Date:</label>
-        <input type="date" id="appointment_date" name="appointment_date" required>
-        
-        <label for="appointment_time">Appointment Time:</label>
-        <input type="time" id="appointment_time" name="appointment_time" required>
-
-        <label for="appointment_length">Appointment Length:</label>
-        <input type="number" id="appointment_length" name="appointment_length" required>
-
-        <label for="assigned_person_id">Assigned Person:</label>
-        <select id="assigned_person_id" name="assigned_person_id">
-            <option value="">Select an assigned person</option>
-            {% for technician in technicians %}
-                <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
-            {% endfor %}
-        </select>
-
-        <label for="location">Location:</label>
-        <select id="location" name="location" required>
-            <option value="">Select a location</option>
-            <option value="In House">In House</option>
-            <option value="At Office">At Office</option>
-            <option value="Remote">Remote</option>
-        </select>
-
-        <label for="status">Status:</label>
-        <select id="status" name="status" required>
-            <option value="Scheduled">Scheduled</option>
-            <option value="Tentatively Scheduled">Tentatively Scheduled</option>
-            <option value="Further Research Needed">Further Research Needed</option>
-            <option value="Closed">Closed</option>
-        </select>
-        
-        <input type="submit" value="Add Ticket">
-    </form>
+            <label for="appointment_length">Appointment Length:</label>
+            <input type="number" id="appointment_length" name="appointment_length" required>
+    
+            <label for="assigned_person_id">Assigned Person:</label>
+            <select id="assigned_person_id" name="assigned_person_id">
+                <option value="">Select an assigned person</option>
+                {% for technician in technicians %}
+                    <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
+                {% endfor %}
+            </select>
+    
+            <label for="location">Location:</label>
+            <select id="location" name="location" required>
+                <option value="">Select a location</option>
+                <option value="In House">In House</option>
+                <option value="At Office">At Office</option>
+                <option value="Remote">Remote</option>
+            </select>
+    
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="Scheduled">Scheduled</option>
+                <option value="Tentatively Scheduled">Tentatively Scheduled</option>
+                <option value="Further Research Needed">Further Research Needed</option>
+                <option value="Closed">Closed</option>
+            </select>
+            
+            <input type="submit" value="Add Ticket">
+        </form>
+    </main>
 </body>
 </html>

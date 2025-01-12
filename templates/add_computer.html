@@ -22,86 +22,87 @@
             </form>
         </nav>
     </header>
+    <main>
+        <h2>Add New Computer</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <label for="computer_id">Computer ID (Serial Number):</label>
+            <input type="text" id="computer_id" name="computer_id" required>
     
-    <h2>Add New Computer</h2>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+            <label for="company">Company:</label>
+            <select id="company" name="company">
+                <option value="">Select a company</option>
+                {% for company in companies %}
+                    <option value="{{ company.name }}">{{ company.name }}</option>
+                {% endfor %}
+            </select>
     
-    <form method="POST">
-        <label for="computer_id">Computer ID (Serial Number):</label>
-        <input type="text" id="computer_id" name="computer_id" required>
-
-        <label for="company">Company:</label>
-        <select id="company" name="company">
-            <option value="">Select a company</option>
-            {% for company in companies %}
-                <option value="{{ company.name }}">{{ company.name }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="model">Model:</label>
-        <select id="model" name="model" required>
-            <option value="">Select a model</option>
-            {% for model in models %}
-                <option value="{{ model.name }}">{{ model.name }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="user_id">Assign to User:</label>
-        <select id="user_id" name="user_id" required>
-            <option value="">Select a user</option>
-            {% for user in users %}
-                <option value="{{ user.id }}">{{ user.full_name }} ({{ user.email }})</option> <!-- Updated to full_name -->
-            {% endfor %}
-        </select>
-
-        <label for="location">Location:</label>
-        <select id="location" name="location" required>
-            <option value="">Select a location</option>
-            <option value="Office">Office</option>
-            <option value="Home">Home</option>
-            <option value="HCS">HCS (Our Office)</option>
-            <option value="Recycling Center">Recycling Center</option>
-        </select>
-
-        <label for="room">Room:</label>
-        <input type="text" id="room" name="room">
-
-        <label for="cpu">CPU:</label>
-        <select id="cpu" name="cpu">
-            <option value="">Select a CPU</option>
-            {% for cpu in cpus %}
-                <option value="{{ cpu.name }}">{{ cpu.name }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="ram">RAM (GB):</label>
-        <input type="number" id="ram" name="ram" min="0">
-
-        <label for="storage">Storage (GB):</label>
-        <input type="number" id="storage" name="storage" min="0">
-
-        <label for="os">Operating System:</label>
-        <select id="os" name="os">
-            <option value="">Select an OS</option>
-            {% for os in oss %}
-                <option value="{{ os.name }}">{{ os.name }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="date_inventoried">Date Inventoried:</label>
-        <input type="date" id="date_inventoried" name="date_inventoried">
-
-        <label for="price">Price:</label>
-        <input type="number" step=".01" id="price" name="price">
-
-        <input type="submit" value="Add Computer">
-    </form>
+            <label for="model">Model:</label>
+            <select id="model" name="model" required>
+                <option value="">Select a model</option>
+                {% for model in models %}
+                    <option value="{{ model.name }}">{{ model.name }}</option>
+                {% endfor %}
+            </select>
+    
+            <label for="user_id">Assign to User:</label>
+            <select id="user_id" name="user_id" required>
+                <option value="">Select a user</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.full_name }} ({{ user.email }})</option> <!-- Updated to full_name -->
+                {% endfor %}
+            </select>
+    
+            <label for="location">Location:</label>
+            <select id="location" name="location" required>
+                <option value="">Select a location</option>
+                <option value="Office">Office</option>
+                <option value="Home">Home</option>
+                <option value="HCS">HCS (Our Office)</option>
+                <option value="Recycling Center">Recycling Center</option>
+            </select>
+    
+            <label for="room">Room:</label>
+            <input type="text" id="room" name="room">
+    
+            <label for="cpu">CPU:</label>
+            <select id="cpu" name="cpu">
+                <option value="">Select a CPU</option>
+                {% for cpu in cpus %}
+                    <option value="{{ cpu.name }}">{{ cpu.name }}</option>
+                {% endfor %}
+            </select>
+    
+            <label for="ram">RAM (GB):</label>
+            <input type="number" id="ram" name="ram" min="0">
+    
+            <label for="storage">Storage (GB):</label>
+            <input type="number" id="storage" name="storage" min="0">
+    
+            <label for="os">Operating System:</label>
+            <select id="os" name="os">
+                <option value="">Select an OS</option>
+                {% for os in oss %}
+                    <option value="{{ os.name }}">{{ os.name }}</option>
+                {% endfor %}
+            </select>
+    
+            <label for="date_inventoried">Date Inventoried:</label>
+            <input type="date" id="date_inventoried" name="date_inventoried">
+    
+            <label for="price">Price:</label>
+            <input type="number" step=".01" id="price" name="price">
+    
+            <input type="submit" value="Add Computer">
+        </form>
+    </main>
 </body>
 </html>

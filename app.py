@@ -179,11 +179,15 @@ def technician_login():
         if technician and check_password_hash(technician.password, password):
             login_user(technician)
             return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('technician_login'))
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     logout_user()
+    flash('You have been logged out.', 'success')
     return redirect(url_for('technician_login'))
 
 @app.route('/create_first_admin', methods=['GET', 'POST'])
@@ -202,6 +206,7 @@ def create_first_admin():
         db.session.add(new_admin_login)
         db.session.commit()
         
+        flash('Admin account created successfully. Welcome to Roundtable!', 'success')
         return redirect(url_for('technician_login'))
     return render_template('create_first_admin.html')
 
@@ -220,8 +225,10 @@ def create_account():
             new_user = TechnicianLogIn(email=email, username=username, password=generate_password_hash(password), role=role)
             db.session.add(new_user)
             db.session.commit()
+            flash('Account created successfully. Please log in.', 'success')
             return redirect(url_for('technician_login'))
         else:
+            flash('No technician registered with this email. Please try again.', 'error')
             return redirect(url_for('create_account'))
         
     return render_template('create_account.html')
@@ -581,6 +588,7 @@ def admin():
                         db.session.delete(ticket)
                     db.session.delete(computer)
             db.session.delete(user)
+            flash('User and associated information deleted successfully.', 'success')
         elif computer_id:
             computer = Computer.query.get_or_404(computer_id)
             if computer:
@@ -589,6 +597,7 @@ def admin():
                 for ticket in tickets_to_delete:
                     db.session.delete(ticket)
             db.session.delete(computer)
+            flash('Computer and associated information deleted successfully.', 'success')
         
         db.session.commit()
         return redirect(url_for('admin'))
@@ -614,6 +623,7 @@ def edit_dropdown_menus():
                     company = Company(name=new_company)
                     db.session.add(company)
                     db.session.commit()
+                    flash('New company added successfully!', 'success')
 
         if 'add_model' in request.form:
             new_model = request.form.get('new_model')
@@ -623,6 +633,7 @@ def edit_dropdown_menus():
                     model = Model(name=new_model)
                     db.session.add(model)
                     db.session.commit()
+                    flash('New model added successfully!', 'success')
 
         if 'add_cpu' in request.form:
             new_cpu = request.form.get('new_cpu')
@@ -632,6 +643,7 @@ def edit_dropdown_menus():
                     cpu = CPU(name=new_cpu)
                     db.session.add(cpu)
                     db.session.commit()
+                    flash('New CPU added successfully!', 'success')
 
         if 'add_os' in request.form:
             new_os = request.form.get('new_os')
@@ -641,6 +653,7 @@ def edit_dropdown_menus():
                     os = OS(name=new_os)
                     db.session.add(os)
                     db.session.commit()
+                    flash('New OS added successfully!', 'success')
 
         if 'delete_company' in request.form:
             delete_company = request.form.get('delete_company')
@@ -649,6 +662,7 @@ def edit_dropdown_menus():
                 if company:
                     db.session.delete(company)
                     db.session.commit()
+                    flash('Company deleted successfully!', 'success')
 
         if 'delete_model' in request.form:
             delete_model = request.form.get('delete_model')
@@ -657,6 +671,7 @@ def edit_dropdown_menus():
                 if model:
                     db.session.delete(model)
                     db.session.commit()
+                    flash('Model deleted successfully!', 'success')
 
         if 'delete_cpu' in request.form:
             delete_cpu = request.form.get('delete_cpu')
@@ -665,6 +680,7 @@ def edit_dropdown_menus():
                 if cpu:
                     db.session.delete(cpu)
                     db.session.commit()
+                    flash('CPU deleted successfully!', 'success')
 
         if 'delete_os' in request.form:
             delete_os = request.form.get('delete_os')
@@ -673,6 +689,7 @@ def edit_dropdown_menus():
                 if os:
                     db.session.delete(os)
                     db.session.commit()
+                    flash('OS deleted successfully!', 'success')
 
     # Get the current dropdown menu items
     companies = Company.query.all()
@@ -705,6 +722,7 @@ def edit_technicians():
                     print(technician.role)
                     db.session.add(technician)
                     db.session.commit()
+                    flash('Technician added successfully!', 'success')
         elif 'delete_technician_submit' in request.form:
             delete_technician = request.form.get('delete_technician')
             if delete_technician:
@@ -715,6 +733,7 @@ def edit_technicians():
                 if technician_login:
                     db.session.delete(technician_login)
                     db.session.commit()
+                    flash('Technician deleted successfully!', 'success')
 
     technicians = Technician.query.all()
     return render_template('admin_edit_technicians.html', technicians=technicians, current_user=current_user)

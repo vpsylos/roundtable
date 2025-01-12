@@ -22,57 +22,59 @@
             </form>
         </nav>
     </header>
+    
+    <main>
+        <h1>Admin Page</h1>
 
-    <h1>Admin Page</h1>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <h2>Delete Users</h2>
-    <form method="post">
-        <label for="user_email">Select User:</label>
-        <select id="user_email" name="user_email">
-            {% if data.users %}
-                {% for user in data.users %}
-                    <option value="{{ user.email }}">{{ user.full_name }} ({{ user.email }})</option>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
                 {% endfor %}
-            {% else %}
-                <option value="">No users found</option>
             {% endif %}
-        </select>
-        <br>
-        <input type="submit" value="Delete User, Associated Computers and Tickets" name="delete_user">
-    </form>
+        {% endwith %}
 
-    <h2>Delete Computers</h2>
-    <form method="post">
-        <label for="computer_id">Select Computer:</label>
-        <select id="computer_id" name="computer_id">
-            {% if data.computers %}
-                {% for computer in data.computers %}
-                    <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
-                {% endfor %}
-            {% else %}
-                <option value="">No computers found</option>
-            {% endif %}
-        </select>
-        <br>
-        <input type="submit" value="Delete Computer and Associated Tickets" name="delete_computer">
-    </form>
+        <h2>Delete Users</h2>
+        <form method="post">
+            <label for="user_email">Select User:</label>
+            <select id="user_email" name="user_email">
+                {% if data.users %}
+                    {% for user in data.users %}
+                        <option value="{{ user.email }}">{{ user.full_name }} ({{ user.email }})</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">No users found</option>
+                {% endif %}
+            </select>
+            <br>
+            <input type="submit" value="Delete User, Associated Computers and Tickets" name="delete_user">
+        </form>
 
-    <h2>Edit Dropdown Menus</h2>
-    <p>
-        <a href="{{ url_for('edit_dropdown_menus') }}">Edit Dropdown Menus</a>
-    </p>
+        <h2>Delete Computers</h2>
+        <form method="post">
+            <label for="computer_id">Select Computer:</label>
+            <select id="computer_id" name="computer_id">
+                {% if data.computers %}
+                    {% for computer in data.computers %}
+                        <option value="{{ computer.id }}">{{ computer.computer_id }} ({{ computer.model.name }})</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">No computers found</option>
+                {% endif %}
+            </select>
+            <br>
+            <input type="submit" value="Delete Computer and Associated Tickets" name="delete_computer">
+        </form>
 
-    <h2>Edit Technicians</h2>
-    <p>
-        <a href="{{ url_for('edit_technicians') }}">Edit Technicians</a>
-    </p>
+        <h2>Edit Dropdown Menus</h2>
+        <p>
+            <a href="{{ url_for('edit_dropdown_menus') }}">Edit Dropdown Menus</a>
+        </p>
+
+        <h2>Edit Technicians</h2>
+        <p>
+            <a href="{{ url_for('edit_technicians') }}">Edit Technicians</a>
+        </p>
+    </main>
 </body>
 </html>

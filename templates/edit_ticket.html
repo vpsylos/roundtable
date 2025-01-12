@@ -22,74 +22,75 @@
             </form>
         </nav>
     </header>
-    
-    <h2>Edit Ticket</h2>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <form method="POST">
-        <label for="issue_summary">Issue Summary:</label>
-        <input type="text" id="issue_summary" name="issue_summary" value="{{ ticket.issue_summary }}" required>
+    <main>
+        <h2>Edit Ticket</h2>
         
-        <label for="user_id">User:</label>
-        <select id="user_id" name="user_id" required>
-            {% for user in users %}
-                <option value="{{ user.id }}" {% if user.id == ticket.user_id %}selected{% endif %}>
-                    {{ user.full_name }} ({{ user.email }})
-                </option>
-            {% endfor %}
-        </select>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         
-        <label for="computer_id">Computer (Optional):</label>
-        <select id="computer_id" name="computer_id">
-            <option value="">Select a computer</option>
-            {% for computer in computers %}
-                <option value="{{ computer.id }}" {% if computer.id == ticket.computer_id %}selected{% endif %}>
-                    {{ computer.computer_id }} ({{ computer.model.name }})
-                </option>
-            {% endfor %}
-        </select>
-        
-        <label for="appointment_date">Appointment Date:</label>
-        <input type="date" id="appointment_date" name="appointment_date" value="{{ ticket.appointment_time.strftime('%Y-%m-%d') }}" required>
-        
-        <label for="appointment_time">Appointment Time:</label>
-        <input type="time" id="appointment_time" name="appointment_time" value="{{ ticket.appointment_time.strftime('%H:%M') }}" required>
+        <form method="POST">
+            <label for="issue_summary">Issue Summary:</label>
+            <input type="text" id="issue_summary" name="issue_summary" value="{{ ticket.issue_summary }}" required>
+            
+            <label for="user_id">User:</label>
+            <select id="user_id" name="user_id" required>
+                {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id == ticket.user_id %}selected{% endif %}>
+                        {{ user.full_name }} ({{ user.email }})
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <label for="computer_id">Computer (Optional):</label>
+            <select id="computer_id" name="computer_id">
+                <option value="">Select a computer</option>
+                {% for computer in computers %}
+                    <option value="{{ computer.id }}" {% if computer.id == ticket.computer_id %}selected{% endif %}>
+                        {{ computer.computer_id }} ({{ computer.model.name }})
+                    </option>
+                {% endfor %}
+            </select>
+            
+            <label for="appointment_date">Appointment Date:</label>
+            <input type="date" id="appointment_date" name="appointment_date" value="{{ ticket.appointment_time.strftime('%Y-%m-%d') }}" required>
+            
+            <label for="appointment_time">Appointment Time:</label>
+            <input type="time" id="appointment_time" name="appointment_time" value="{{ ticket.appointment_time.strftime('%H:%M') }}" required>
 
-        <label for="appointment_length">Appointment Length:</label>
-        <input type="number" id="appointment_length" name="appointment_length" value="{{ ticket.appointment_length }}" required>
+            <label for="appointment_length">Appointment Length:</label>
+            <input type="number" id="appointment_length" name="appointment_length" value="{{ ticket.appointment_length }}" required>
 
-        <label for="assigned_person_id">Assigned Person:</label>
-        <select id="assigned_person_id" name="assigned_person_id">
-            <option value="">Select an assigned person</option>
-            {% for technician in technicians %}
-                <option value="{{ technician.id }}" {% if technician.id == ticket.assigned_person_id %}selected{% endif %}>{{ technician.full_name }} ({{ technician.email }})</option>
-            {% endfor %}
-        </select>
-        
-        <label for="location">Location:</label>
-        <select id="location" name="location" required>
-            <option value="" {% if not ticket.location %}selected{% endif %}>Select a location</option>
-            <option value="In House" {% if ticket.location == 'In House' %}selected{% endif %}>In House</option>
-            <option value="At Office" {% if ticket.location == 'At Office' %}selected{% endif %}>At Office</option>
-            <option value="Remote" {% if ticket.location == 'Remote' %}selected{% endif %}>Remote</option>
-        </select>
+            <label for="assigned_person_id">Assigned Person:</label>
+            <select id="assigned_person_id" name="assigned_person_id">
+                <option value="">Select an assigned person</option>
+                {% for technician in technicians %}
+                    <option value="{{ technician.id }}" {% if technician.id == ticket.assigned_person_id %}selected{% endif %}>{{ technician.full_name }} ({{ technician.email }})</option>
+                {% endfor %}
+            </select>
+            
+            <label for="location">Location:</label>
+            <select id="location" name="location" required>
+                <option value="" {% if not ticket.location %}selected{% endif %}>Select a location</option>
+                <option value="In House" {% if ticket.location == 'In House' %}selected{% endif %}>In House</option>
+                <option value="At Office" {% if ticket.location == 'At Office' %}selected{% endif %}>At Office</option>
+                <option value="Remote" {% if ticket.location == 'Remote' %}selected{% endif %}>Remote</option>
+            </select>
 
-        <label for="status">Status:</label>
-        <select id="status" name="status" required>
-            <option value="Scheduled" {% if ticket.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
-            <option value="Tentatively Scheduled" {% if ticket.status == 'Tentatively Scheduled' %}selected{% endif %}>Tentatively Scheduled</option>
-            <option value="Further Research Needed" {% if ticket.status == 'Further Research Needed' %}selected{% endif %}>Further Research Needed</option>
-            <option value="Closed" {% if ticket.status == 'Closed' %}selected{% endif %}>Closed</option>
-        </select>
-        
-        <input type="submit" value="Update Ticket">
-    </form>
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="Scheduled" {% if ticket.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                <option value="Tentatively Scheduled" {% if ticket.status == 'Tentatively Scheduled' %}selected{% endif %}>Tentatively Scheduled</option>
+                <option value="Further Research Needed" {% if ticket.status == 'Further Research Needed' %}selected{% endif %}>Further Research Needed</option>
+                <option value="Closed" {% if ticket.status == 'Closed' %}selected{% endif %}>Closed</option>
+            </select>
+            
+            <input type="submit" value="Update Ticket">
+        </form>
+    </main>
 </body>
 </html>

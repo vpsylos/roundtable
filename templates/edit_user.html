@@ -22,58 +22,59 @@
             </form>
         </nav>
     </header>
+    <main>
+        <h2>Edit User</h2>
 
-    <h2>Edit User</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <form method="POST">
+            <label for="full_name">Full Name:</label>
+            <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
 
-    <form method="POST">
-        <label for="full_name">Full Name:</label>
-        <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+            <label for="pronouns">Pronouns:</label>
+            <input type="text" id="pronouns" name="pronouns" value="{{ user.pronouns }}">
 
-        <label for="pronouns">Pronouns:</label>
-        <input type="text" id="pronouns" name="pronouns" value="{{ user.pronouns }}">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="Faculty" {% if user.role == 'Faculty' %}selected{% endif %}>Faculty</option>
+                <option value="Staff" {% if user.role == 'Staff' %}selected{% endif %}>Staff</option>
+                <option value="Other" {% if user.role == 'Other' %}selected{% endif %}>Other</option>
+            </select>
 
-        <label for="role">Role:</label>
-        <select id="role" name="role" required>
-            <option value="Faculty" {% if user.role == 'Faculty' %}selected{% endif %}>Faculty</option>
-            <option value="Staff" {% if user.role == 'Staff' %}selected{% endif %}>Staff</option>
-            <option value="Other" {% if user.role == 'Other' %}selected{% endif %}>Other</option>
-        </select>
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department" value="{{ user.department }}">
 
-        <label for="department">Department:</label>
-        <input type="text" id="department" name="department" value="{{ user.department }}">
+            <label for="office_number">Office Number:</label>
+            <input type="text" id="office_number" name="office_number" value="{{ user.office_number }}">
 
-        <label for="office_number">Office Number:</label>
-        <input type="text" id="office_number" name="office_number" value="{{ user.office_number }}">
+            <label for="cellphone_number">Cellphone Number:</label>
+            <input type="text" id="cellphone_number" name="cellphone_number" value="{{ user.cellphone_number }}">
 
-        <label for="cellphone_number">Cellphone Number:</label>
-        <input type="text" id="cellphone_number" name="cellphone_number" value="{{ user.cellphone_number }}">
+            <label for="uniID">University ID:</label>
+            <input type="text" id="uniID" name="uniID" value="{{ user.uniID }}" required>
 
-        <label for="uniID">University ID:</label>
-        <input type="text" id="uniID" name="uniID" value="{{ user.uniID }}" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            <label for="office_location">Office Location:</label>
+            <input type="text" id="office_location" name="office_location" value="{{ user.office_location }}">
 
-        <label for="office_location">Office Location:</label>
-        <input type="text" id="office_location" name="office_location" value="{{ user.office_location }}">
+            <label for="last_replaced_date">Last Replaced Date:</label>
+            <input type="date" id="last_replaced_date" name="last_replaced_date"
+                value="{{ user.last_replaced_date.strftime('%Y-%m-%d') if user.last_replaced_date else '' }}">
 
-        <label for="last_replaced_date">Last Replaced Date:</label>
-        <input type="date" id="last_replaced_date" name="last_replaced_date"
-               value="{{ user.last_replaced_date.strftime('%Y-%m-%d') if user.last_replaced_date else '' }}">
+            <label for="replacement_cycle_years">Replacement Cycle (Years):</label>
+            <input type="number" id="replacement_cycle_years" name="replacement_cycle_years"
+                value="{{ user.replacement_cycle_years }}">
 
-        <label for="replacement_cycle_years">Replacement Cycle (Years):</label>
-        <input type="number" id="replacement_cycle_years" name="replacement_cycle_years"
-               value="{{ user.replacement_cycle_years }}">
-
-        <input type="submit" value="Update User">
-    </form>
+            <input type="submit" value="Update User">
+        </form>
+    </main>
 </body>
 </html>

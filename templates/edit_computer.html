@@ -23,96 +23,97 @@
             </form>
         </nav>
     </header>
+    <main>
+        <h2>Edit Computer</h2>
 
-    <h2>Edit Computer</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+        <form method="POST">
+            <label for="computer_id">Computer ID (Serial Number):</label>
+            <input type="text" id="computer_id" name="computer_id" value="{{ computer.computer_id }}" required>
 
-    <form method="POST">
-        <label for="computer_id">Computer ID (Serial Number):</label>
-        <input type="text" id="computer_id" name="computer_id" value="{{ computer.computer_id }}" required>
+            <label for="company">Company:</label>
+            <select id="company" name="company">
+                <option value="">Select a company</option>
+                {% for company in companies %}
+                    <option value="{{ company.name }}" {% if company.name == computer.company %}selected{% endif %}>
+                        {{ company.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <label for="company">Company:</label>
-        <select id="company" name="company">
-            <option value="">Select a company</option>
-            {% for company in companies %}
-                <option value="{{ company.name }}" {% if company.name == computer.company %}selected{% endif %}>
-                    {{ company.name }}
-                </option>
-            {% endfor %}
-        </select>
+            <label for="model">Model:</label>
+            <select id="model" name="model" required>
+                <option value="">Select a model</option>
+                {% for model in models %}
+                    <option value="{{ model.name }}" {% if model.name == computer.model %}selected{% endif %}>
+                        {{ model.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <label for="model">Model:</label>
-        <select id="model" name="model" required>
-            <option value="">Select a model</option>
-            {% for model in models %}
-                <option value="{{ model.name }}" {% if model.name == computer.model %}selected{% endif %}>
-                    {{ model.name }}
-                </option>
-            {% endfor %}
-        </select>
+            <label for="user_id">Assign to User:</label>
+            <select id="user_id" name="user_id" required>
+                <option value="">Select a user</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id == computer.assigned_user_id %}selected{% endif %}>
+                        {{ user.full_name }} ({{ user.email }})
+                    </option>
+                {% endfor %}
+            </select>
 
-        <label for="user_id">Assign to User:</label>
-        <select id="user_id" name="user_id" required>
-            <option value="">Select a user</option>
-            {% for user in users %}
-                <option value="{{ user.id }}" {% if user.id == computer.assigned_user_id %}selected{% endif %}>
-                    {{ user.full_name }} ({{ user.email }})
-                </option>
-            {% endfor %}
-        </select>
+            <label for="location">Location:</label>
+            <select id="location" name="location" required>
+                <option value="">Select a location</option>
+                <option value="Office" {% if computer.location == "Office" %}selected{% endif %}>Office</option>
+                <option value="Home" {% if computer.location == "Home" %}selected{% endif %}>Home</option>
+                <option value="HCS" {% if computer.location == "HCS" %}selected{% endif %}>HCS (Our Office)</option>
+                <option value="Recycling Center" {% if computer.location == "Recycling Center" %}selected{% endif %}>Recycling Center</option>
+            </select>
 
-        <label for="location">Location:</label>
-        <select id="location" name="location" required>
-            <option value="">Select a location</option>
-            <option value="Office" {% if computer.location == "Office" %}selected{% endif %}>Office</option>
-            <option value="Home" {% if computer.location == "Home" %}selected{% endif %}>Home</option>
-            <option value="HCS" {% if computer.location == "HCS" %}selected{% endif %}>HCS (Our Office)</option>
-            <option value="Recycling Center" {% if computer.location == "Recycling Center" %}selected{% endif %}>Recycling Center</option>
-        </select>
+            <label for="room">Room:</label>
+            <input type="text" id="room" name="room" value="{{ computer.room }}">
 
-        <label for="room">Room:</label>
-        <input type="text" id="room" name="room" value="{{ computer.room }}">
+            <label for="cpu">CPU:</label>
+            <select id="cpu" name="cpu">
+                <option value="">Select a CPU</option>
+                {% for cpu in cpus %}
+                    <option value="{{ cpu.name }}" {% if cpu.name == computer.cpu %}selected{% endif %}>
+                        {{ cpu.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <label for="cpu">CPU:</label>
-        <select id="cpu" name="cpu">
-            <option value="">Select a CPU</option>
-            {% for cpu in cpus %}
-                <option value="{{ cpu.name }}" {% if cpu.name == computer.cpu %}selected{% endif %}>
-                    {{ cpu.name }}
-                </option>
-            {% endfor %}
-        </select>
+            <label for="ram">RAM (GB):</label>
+            <input type="number" id="ram" name="ram" value="{{ computer.ram }}" min="0">
 
-        <label for="ram">RAM (GB):</label>
-        <input type="number" id="ram" name="ram" value="{{ computer.ram }}" min="0">
+            <label for="storage">Storage (GB):</label>
+            <input type="number" id="storage" name="storage" value="{{ computer.storage }}" min="0">
 
-        <label for="storage">Storage (GB):</label>
-        <input type="number" id="storage" name="storage" value="{{ computer.storage }}" min="0">
+            <label for="os">Operating System:</label>
+            <select id="os" name="os">
+                <option value="">Select an OS</option>
+                {% for os in oss %}
+                    <option value="{{ os.name }}" {% if os.name == computer.os %}selected{% endif %}>
+                        {{ os.name }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <label for="os">Operating System:</label>
-        <select id="os" name="os">
-            <option value="">Select an OS</option>
-            {% for os in oss %}
-                <option value="{{ os.name }}" {% if os.name == computer.os %}selected{% endif %}>
-                    {{ os.name }}
-                </option>
-            {% endfor %}
-        </select>
+            <label for="date_inventoried">Date Inventoried:</label>
+            <input type="date" id="date_inventoried" name="date_inventoried" value="{{ computer.date_inventoried.strftime('%Y-%m-%d') if computer.date_inventoried else '' }}">
 
-        <label for="date_inventoried">Date Inventoried:</label>
-        <input type="date" id="date_inventoried" name="date_inventoried" value="{{ computer.date_inventoried.strftime('%Y-%m-%d') if computer.date_inventoried else '' }}">
+            <label for="price">Price:</label>
+            <input type="number" step=".01" id="price" name="price" value="{{ computer.price }}">
 
-        <label for="price">Price:</label>
-        <input type="number" step=".01" id="price" name="price" value="{{ computer.price }}">
-
-        <input type="submit" value="Save Changes">
-    </form>
+            <input type="submit" value="Save Changes">
+        </form>
+    </main>
 </body>
 </html>
