@@ -105,6 +105,7 @@ class Computer(db.Model):
     os = db.relationship('OS', backref='computers_oss')  # Operating system
     date_inventoried = db.Column(db.DateTime)  # Date when the computer was inventoried
     price = db.Column(db.Float)  # Price of the computer
+    tickets = db.relationship('Ticket', backref='computers_tickets', lazy=True)
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'

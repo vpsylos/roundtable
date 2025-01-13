@@ -34,11 +34,18 @@
 
         <h2>Computer Details</h2>
         <p><strong>Computer ID:</strong> {{ computer.computer_id }}</p>
-        <p><strong>Model:</strong> {{ computer.model.name }}</p>
+        <p><strong>Model:</strong> {{ computer.company.name }} {{ computer.model.name }}</p>
+        <p><strong>Location:</strong> {{ computer.location }}, {{ computer.room }}</p>
+        <p><strong>CPU:</strong> {{ computer.cpu.name }}</p>
+        <p><strong>RAM:</strong> {{ computer.ram }} GB</p>
+        <p><strong>Storage:</strong> {{ computer.storage }} GB</p>
+        <p><strong>OS:</strong> {{ computer.os.name }}</p>
+        <p><strong>Date Inventoried:</strong> {{ computer.date_inventoried.strftime('%Y-%m-%d') }}</p>
+        <p><strong>Price:</strong> ${{ computer.price }}</p>
 
         <h3>Assigned User</h3>
         {% if computer.assigned_user %}
-            <p><strong>User Name:</strong> {{ computer.assigned_user.name }}</p>
+            <p><strong>User Name:</strong> {{ computer.assigned_user.full_name }}</p>
             <p><strong>Email:</strong> {{ computer.assigned_user.email }}</p>
         {% else %}
             <p>No user assigned.</p>
@@ -47,22 +54,26 @@
         <a href="{{ url_for('edit_computer', computer_id=computer.id) }}">Edit</a>
 
         <h3>Assigned Tickets</h3>
-        {% if computer.tickets %}
-            <ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Issue Summary</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for ticket in computer.tickets %}
-                    <li>
-                        Issue Summary: {{ ticket.issue_summary }} - 
-                        Status: {{ ticket.status }} - 
-                        Date: {{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}
-                        <a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a>
-                    </li>
+                    <tr>
+                        <td>{{ ticket.issue_summary }}</td>
+                        <td>{{ ticket.status }}</td>
+                        <td>{{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
+                    </tr>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No tickets assigned to this computer.</p>
-        {% endif %}
-
-        <a href="{{ url_for('home') }}">Back to Home</a>
+            </tbody>
+        </table>
     </main>
 </body>
 </html>
