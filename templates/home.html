@@ -57,7 +57,11 @@
                     <td><a href="{{ url_for('user_profile', user_id=ticket.user.id) }}">{{ ticket.user.full_name }}</a></td>
 
                     <!-- Display computer model -->
-                    <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model.name if ticket.computer else 'N/A' }}</a></td>
+                    {% if ticket.computer_id %}
+                        <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model.name }}</a></td>
+                    {% else %}
+                        <td>N/A</td>
+                    {% endif %}
 
                     <!-- Display other ticket details -->
                     <td>{{ ticket.issue_summary }}</td>

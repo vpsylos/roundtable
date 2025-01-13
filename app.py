@@ -111,7 +111,7 @@ class Ticket(db.Model):
     __tablename__ = 'ticket'
     
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Nullable for computer association
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Nullable for computer association
     user = db.relationship('User', backref='tickets_users', lazy=True)
     computer_id = db.Column(db.Integer, db.ForeignKey('computer.id'), nullable=True)  # Nullable for user association
     computer = db.relationship('Computer', backref='tickets_computers', lazy=True)
@@ -379,16 +379,28 @@ def add_ticket():
         # Combine date and time
         appointment_datetime = datetime.strptime(f"{appointment_date} {appointment_time}", "%Y-%m-%d %H:%M")
         
-        new_ticket = Ticket(
-            issue_summary=issue_summary,
-            user_id=user_id,
-            computer_id=computer_id,
-            appointment_time=appointment_datetime,
-            appointment_length=appointment_length,  # Added this line
-            assigned_person_id=assigned_person_id,  # Added this line
-            location=location,  # Added this line
-            status=status
-        )
+        if computer_id is None:
+            new_ticket = Ticket(
+                issue_summary=issue_summary,
+                user_id=user_id,
+                computer_id=None,
+                appointment_time=appointment_datetime,
+                appointment_length=appointment_length,  # Added this line
+                assigned_person_id=assigned_person_id,  # Added this line
+                location=location,  # Added this line
+                status=status
+            )
+        else:
+            new_ticket = Ticket(
+                issue_summary=issue_summary,
+                user_id=user_id,
+                computer_id=computer_id,
+                appointment_time=appointment_datetime,
+                appointment_length=appointment_length,  # Added this line
+                assigned_person_id=assigned_person_id,  # Added this line
+                location=location,  # Added this line
+                status=status
+            )
         
         try:
             db.session.add(new_ticket)
