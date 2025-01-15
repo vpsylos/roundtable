@@ -7,7 +7,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import logging
 import os
+import secrets
 from dotenv import load_dotenv
+
+# Create a .env file if it doesn't exist
+env_file = '.env'
+if not os.path.isfile(env_file):
+    with open(env_file, 'w') as f:
+        secret_key = secrets.token_hex(32)
+        f.write(f"SECRET_KEY={secret_key}")
 
 load_dotenv()
 
