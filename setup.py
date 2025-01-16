@@ -13,11 +13,7 @@ if not os.path.exists(venv_dir):
     try:
         subprocess.run(f'python -m venv {venv_dir}', shell=True, cwd=os.path.abspath('.'))
     except subprocess.CalledProcessError as e:
-        if e.returncode == 127:
-            subprocess.run(f'python3 -m venv {venv_dir}', shell=True, cwd=os.path.abspath('.'))
-        else:
-            print(f"Error creating virtual environment: {e}")
-            exit(1)
+        subprocess.run(f'python3 -m venv {venv_dir}', shell=True, cwd=os.path.abspath('.'))
 
 # Activate the virtual environment
 print("Activating virtual environment...")
