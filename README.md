@@ -1,6 +1,9 @@
 # Roundtable
 A proof-of-concept ticketing system for a tech support office in my university.
 
+## How to run
+First, click on the Code button and download the zip file. Then, create and activate a virtual environment. Then, download all the dependencies using `pip install -r requirements.txt`
+
 ## First run
 When you first launch the program, you will be prompted to create an admin account. Once this has been done, you can log in to the system.
 
