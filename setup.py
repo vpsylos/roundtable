@@ -7,7 +7,7 @@ with open('requirements.txt', 'r') as f:
     DEPENDENCIES = [line.strip() for line in f.readlines()]
 
 # Create a virtual environment
-venv_dir = 'venv'
+venv_dir = './venv'
 if not os.path.exists(venv_dir):
     print("Creating virtual environment...")
     subprocess.run(f'python -m venv {venv_dir}', shell=True)
