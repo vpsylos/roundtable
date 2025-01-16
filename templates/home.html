@@ -1,79 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a id="theme-toggle" href="#">Switch to Dark Mode</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
+{% extends 'base.html' %}
 
-    <main>
+{% block content %}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <h2>Open Appointments</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>User Name</th>
-                    <th>Computer Model</th> <!-- Displaying model instead of ID -->
-                    <th>Issue Summary</th>
-                    <th>Assigned Person</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in tickets %}
-                <tr>
-                    <td>{{ ticket.appointment_time.strftime('%Y-%m-%d') }}</td>
-                    <td>{{ ticket.appointment_time.strftime('%H:%M') }}</td>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <h2>Open Appointments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>User Name</th>
+                <th>Computer Model</th> <!-- Displaying model instead of ID -->
+                <th>Issue Summary</th>
+                <th>Assigned Person</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.appointment_time.strftime('%Y-%m-%d') }}</td>
+                <td>{{ ticket.appointment_time.strftime('%H:%M') }}</td>
 
-                    <!-- Display user name -->
-                    <td><a href="{{ url_for('user_profile', user_id=ticket.user.id) }}">{{ ticket.user.full_name }}</a></td>
+                <!-- Display user name -->
+                <td><a href="{{ url_for('user_profile', user_id=ticket.user.id) }}">{{ ticket.user.full_name }}</a></td>
 
-                    <!-- Display computer model -->
-                    {% if ticket.computer_id %}
-                        <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model.name }}</a></td>
-                    {% else %}
-                        <td>N/A</td>
-                    {% endif %}
+                <!-- Display computer model -->
+                {% if ticket.computer_id %}
+                    <td><a href="{{ url_for('computer_profile', computer_id=ticket.computer.id) }}">{{ ticket.computer.model.name }}</a></td>
+                {% else %}
+                    <td>N/A</td>
+                {% endif %}
 
-                    <!-- Display other ticket details -->
-                    <td>{{ ticket.issue_summary }}</td>
-                    <td>{{ ticket.assigned_person.full_name }}</td>
-                    <td>{{ ticket.status }}</td>
-                    <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
-</body>
-</html>
+                <!-- Display other ticket details -->
+                <td>{{ ticket.issue_summary }}</td>
+                <td>{{ ticket.assigned_person.full_name }}</td>
+                <td>{{ ticket.status }}</td>
+                <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

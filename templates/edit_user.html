@@ -1,80 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User - University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
-    <main>
-        <h2>Edit User</h2>
+{% extends "base.html" %}
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% block content %}
+    <h2>Edit User</h2>
 
-        <form method="POST">
-            <label for="full_name">Full Name:</label>
-            <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-            <label for="pronouns">Pronouns:</label>
-            <input type="text" id="pronouns" name="pronouns" value="{{ user.pronouns }}">
+    <form method="POST">
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" value="{{ user.full_name }}" required>
 
-            <label for="role">Role:</label>
-            <select id="role" name="role" required>
-                <option value="Faculty" {% if user.role == 'Faculty' %}selected{% endif %}>Faculty</option>
-                <option value="Staff" {% if user.role == 'Staff' %}selected{% endif %}>Staff</option>
-                <option value="Other" {% if user.role == 'Other' %}selected{% endif %}>Other</option>
-            </select>
+        <label for="pronouns">Pronouns:</label>
+        <input type="text" id="pronouns" name="pronouns" value="{{ user.pronouns }}">
 
-            <label for="department">Department:</label>
-            <input type="text" id="department" name="department" value="{{ user.department }}">
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="Faculty" {% if user.role == 'Faculty' %}selected{% endif %}>Faculty</option>
+            <option value="Staff" {% if user.role == 'Staff' %}selected{% endif %}>Staff</option>
+            <option value="Other" {% if user.role == 'Other' %}selected{% endif %}>Other</option>
+        </select>
 
-            <label for="office_number">Office Number:</label>
-            <input type="text" id="office_number" name="office_number" value="{{ user.office_number }}">
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department" value="{{ user.department }}">
 
-            <label for="cellphone_number">Cellphone Number:</label>
-            <input type="text" id="cellphone_number" name="cellphone_number" value="{{ user.cellphone_number }}">
+        <label for="office_number">Office Number:</label>
+        <input type="text" id="office_number" name="office_number" value="{{ user.office_number }}">
 
-            <label for="uniID">University ID:</label>
-            <input type="text" id="uniID" name="uniID" value="{{ user.uniID }}" required>
+        <label for="cellphone_number">Cellphone Number:</label>
+        <input type="text" id="cellphone_number" name="cellphone_number" value="{{ user.cellphone_number }}">
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        <label for="uniID">University ID:</label>
+        <input type="text" id="uniID" name="uniID" value="{{ user.uniID }}" required>
 
-            <label for="office_location">Office Location:</label>
-            <input type="text" id="office_location" name="office_location" value="{{ user.office_location }}">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
 
-            <label for="last_replaced_date">Last Replaced Date:</label>
-            <input type="date" id="last_replaced_date" name="last_replaced_date"
-                value="{{ user.last_replaced_date.strftime('%Y-%m-%d') if user.last_replaced_date else '' }}">
+        <label for="office_location">Office Location:</label>
+        <input type="text" id="office_location" name="office_location" value="{{ user.office_location }}">
 
-            <label for="replacement_cycle_years">Replacement Cycle (Years):</label>
-            <input type="number" id="replacement_cycle_years" name="replacement_cycle_years"
-                value="{{ user.replacement_cycle_years }}">
+        <label for="last_replaced_date">Last Replaced Date:</label>
+        <input type="date" id="last_replaced_date" name="last_replaced_date"
+            value="{{ user.last_replaced_date.strftime('%Y-%m-%d') if user.last_replaced_date else '' }}">
 
-            <input type="submit" value="Update User">
-        </form>
-    </main>
-</body>
-</html>
+        <label for="replacement_cycle_years">Replacement Cycle (Years):</label>
+        <input type="number" id="replacement_cycle_years" name="replacement_cycle_years"
+            value="{{ user.replacement_cycle_years }}">
+
+        <input type="submit" value="Update User">
+    </form>
+{% endblock %}

@@ -1,79 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Profile - {{ computer.computer_id }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
+{% extends 'base.html' %}
 
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <h2>Computer Details</h2>
-        <p><strong>Computer ID:</strong> {{ computer.computer_id }}</p>
-        <p><strong>Model:</strong> {{ computer.company.name }} {{ computer.model.name }}</p>
-        <p><strong>Location:</strong> {{ computer.location }}, {{ computer.room }}</p>
-        <p><strong>CPU:</strong> {{ computer.cpu.name }}</p>
-        <p><strong>RAM:</strong> {{ computer.ram }} GB</p>
-        <p><strong>Storage:</strong> {{ computer.storage }} GB</p>
-        <p><strong>OS:</strong> {{ computer.os.name }}</p>
-        <p><strong>Date Inventoried:</strong> {{ computer.date_inventoried.strftime('%Y-%m-%d') }}</p>
-        <p><strong>Price:</strong> ${{ computer.price }}</p>
-
-        <h3>Assigned User</h3>
-        {% if computer.assigned_user %}
-            <p><strong>User Name:</strong> {{ computer.assigned_user.full_name }}</p>
-            <p><strong>Email:</strong> {{ computer.assigned_user.email }}</p>
-        {% else %}
-            <p>No user assigned.</p>
+{% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
         {% endif %}
+    {% endwith %}
 
-        <a href="{{ url_for('edit_computer', computer_id=computer.id) }}">Edit</a>
+    <h2>Computer Details</h2>
+    <p><strong>Computer ID:</strong> {{ computer.computer_id }}</p>
+    <p><strong>Model:</strong> {{ computer.company.name }} {{ computer.model.name }}</p>
+    <p><strong>Location:</strong> {{ computer.location }}, {{ computer.room }}</p>
+    <p><strong>CPU:</strong> {{ computer.cpu.name }}</p>
+    <p><strong>RAM:</strong> {{ computer.ram }} GB</p>
+    <p><strong>Storage:</strong> {{ computer.storage }} GB</p>
+    <p><strong>OS:</strong> {{ computer.os.name }}</p>
+    <p><strong>Date Inventoried:</strong> {{ computer.date_inventoried.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Price:</strong> ${{ computer.price }}</p>
 
-        <h3>Assigned Tickets</h3>
-        <table>
-            <thead>
+    <h3>Assigned User</h3>
+    {% if computer.assigned_user %}
+        <p><strong>User Name:</strong> {{ computer.assigned_user.full_name }}</p>
+        <p><strong>Email:</strong> {{ computer.assigned_user.email }}</p>
+    {% else %}
+        <p>No user assigned.</p>
+    {% endif %}
+
+    <a href="{{ url_for('edit_computer', computer_id=computer.id) }}">Edit</a>
+
+    <h3>Assigned Tickets</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Issue Summary</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in computer.tickets %}
                 <tr>
-                    <th>Issue Summary</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Edit</th>
+                    <td>{{ ticket.issue_summary }}</td>
+                    <td>{{ ticket.status }}</td>
+                    <td>{{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for ticket in computer.tickets %}
-                    <tr>
-                        <td>{{ ticket.issue_summary }}</td>
-                        <td>{{ ticket.status }}</td>
-                        <td>{{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
-</body>
-</html>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

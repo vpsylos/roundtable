@@ -1,82 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile - {{ user.name }} - University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <h2>{{ user.full_name }}</h2>
-        
-        <p><strong>Role:</strong> {{ user.role }}</p>
-        <p><strong>Pronouns:</strong> {{ user.pronouns }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Department:</strong> {{ user.department }}</p>
-        <p><strong>Office Phone Number:</strong> {{ user.office_number }}</p>
-        <p><strong>Cell Phone Number:</strong> {{ user.cellphone_number }}</p>
-        <p><strong>Office Location:</strong> {{user.office_location}}</p>
-        <p><strong>Last Date of Replacement:</strong> {{user.last_replaced_date}}</p>
-
-        <a href="{{ url_for('edit_user', user_id=user.id) }}">Edit</a>
-
-        <h3>Assigned Computers</h3>
-        {% if user.computers %}
-            <ul>
-                {% for computer in user.computers %}
-                    <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model.name }})</a></li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No computers assigned.</p>
+{% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
         {% endif %}
+    {% endwith %}
 
-        <h3>Tickets</h3>
-        <table>
-            <thead>
+    <h2>{{ user.full_name }}</h2>
+    
+    <p><strong>Role:</strong> {{ user.role }}</p>
+    <p><strong>Pronouns:</strong> {{ user.pronouns }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Department:</strong> {{ user.department }}</p>
+    <p><strong>Office Phone Number:</strong> {{ user.office_number }}</p>
+    <p><strong>Cell Phone Number:</strong> {{ user.cellphone_number }}</p>
+    <p><strong>Office Location:</strong> {{user.office_location}}</p>
+    <p><strong>Last Date of Replacement:</strong> {{user.last_replaced_date}}</p>
+
+    <a href="{{ url_for('edit_user', user_id=user.id) }}">Edit</a>
+
+    <h3>Assigned Computers</h3>
+    {% if user.computers %}
+        <ul>
+            {% for computer in user.computers %}
+                <li><a href="{{ url_for('computer_profile', computer_id=computer.id) }}">{{ computer.computer_id }} ({{ computer.model.name }})</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No computers assigned.</p>
+    {% endif %}
+
+    <h3>Tickets</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Issue Summary</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in user.tickets %}
                 <tr>
-                    <th>Issue Summary</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Edit</th>
+                    <td>{{ ticket.issue_summary }}</td>
+                    <td>{{ ticket.status }}</td>
+                    <td>{{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for ticket in user.tickets %}
-                    <tr>
-                        <td>{{ ticket.issue_summary }}</td>
-                        <td>{{ ticket.status }}</td>
-                        <td>{{ ticket.appointment_time.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td><a href="{{ url_for('edit_ticket', ticket_id=ticket.id) }}">Edit</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </main>
-</body>
-</html>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

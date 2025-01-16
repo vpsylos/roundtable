@@ -1,29 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results - University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers" value="{{ query }}">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
-    
-    <main>
+{% extends "base.html" %}
+
+{% block content %}
         <h2>Search Results for "{{ query }}"</h2>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -49,6 +26,5 @@
             <li>No computers found</li>
         {% endfor %}
         </ul>
-    </main>
-</body>
-</html>
+
+{% endblock %}

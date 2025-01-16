@@ -1,75 +1,51 @@
-<!-- admin_edit_technicians.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Computer - University Tech Support</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Roundtable</h1>
-        <nav>
-            <a href="{{ url_for('home') }}">Home</a>
-            <a href="{{ url_for('add_user') }}">Add User</a>
-            <a href="{{ url_for('add_computer') }}">Add Computer</a>
-            <a href="{{ url_for('add_ticket') }}">Add Ticket</a>
-            <a href="{{ url_for('admin') }}">Admin</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-            <form action="{{ url_for('search') }}" method="get">
-                <input type="text" name="q" placeholder="Search users or computers">
-                <button type="submit">Search</button>
-            </form>
-        </nav>
-    </header>
-    <main>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash {{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+{% extends 'base.html' %}
 
-        <h2>Technicians</h2>
-        <ul>
-            {% for technician in technicians %}
-                <li>{{ technician.full_name }} ({{ technician.email }})</li>
+{% block content %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
             {% endfor %}
-        </ul>
+        {% endif %}
+    {% endwith %}
 
-        <h2>Add New Technician:</h2>
-        <form method="POST">
-            <label for="full_name">Full Name:</label>
-            <input type="text" id="full_name" name="full_name" required>
-            <br>
-            <label for="pronouns">Pronouns:</label>
-            <input type="text" id="pronouns" name="pronouns">
-            <br>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <br>
-            <label for="role">Role:</label>
-            <select id="role" name="role" required>
-                <option value="Admin">Admin</option>
-                <option value="Technician">Technician</option>
-            </select>
-            <input type="submit" value="Add Technician" name="add_technician">
-        </form>
+    <h2>Technicians</h2>
+    <ul>
+        {% for technician in technicians %}
+            <li>{{ technician.full_name }} ({{ technician.email }})</li>
+        {% endfor %}
+    </ul>
 
-        <h2>Delete Technician:</h2>
-        <form method="POST">
-            <select id="delete_technician" name="delete_technician">
-                <option value="">Select a technician to delete</option>
-                {% for technician in technicians %}
-                    {% if technician.email != current_user.email %}
-                        <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
-                    {% endif %}
-                {% endfor %}
-            </select>
-            <input type="submit" value="Delete Technician" name="delete_technician_submit">
-        </form>
-    </main>
-</body>
-</html>
+    <h2>Add New Technician:</h2>
+    <form method="POST">
+        <label for="full_name">Full Name:</label>
+        <input type="text" id="full_name" name="full_name" required>
+        <br>
+        <label for="pronouns">Pronouns:</label>
+        <input type="text" id="pronouns" name="pronouns">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="Admin">Admin</option>
+            <option value="Technician">Technician</option>
+        </select>
+        <input type="submit" value="Add Technician" name="add_technician">
+    </form>
+
+    <h2>Delete Technician:</h2>
+    <form method="POST">
+        <select id="delete_technician" name="delete_technician">
+            <option value="">Select a technician to delete</option>
+            {% for technician in technicians %}
+                {% if technician.email != current_user.email %}
+                    <option value="{{ technician.id }}">{{ technician.full_name }} ({{ technician.email }})</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <input type="submit" value="Delete Technician" name="delete_technician_submit">
+    </form>
+
+{% endblock %}
