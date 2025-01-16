@@ -760,5 +760,4 @@ def edit_technicians():
     return render_template('admin_edit_technicians.html', technicians=technicians, current_user=current_user)
 
 if __name__ == '__main__':
-    create_admin_user()
     app.run(debug=True)
