@@ -10,7 +10,7 @@ with open('requirements.txt', 'r') as f:
 venv_dir = './venv'
 if not os.path.exists(venv_dir):
     print("Creating virtual environment...")
-    subprocess.run(f'python -m venv {venv_dir}', shell=True)
+    subprocess.run(f'python -m venv {venv_dir}', shell=True, cwd=os.path.abspath('.'))
 
 # Activate the virtual environment
 print("Activating virtual environment...")
