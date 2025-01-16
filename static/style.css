@@ -2,6 +2,8 @@ body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 header {
@@ -50,7 +52,15 @@ th, td {
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: var(--table-header-color);
+}
+
+main a {
+    color: var(--link-color);
+}
+
+main a:hover {
+    color: var(--link-hover-color);
 }
 
 form {
@@ -79,7 +89,7 @@ input[type="submit"] {
     display: block;
     width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #660000;
     color: white;
     border: none;
     cursor: pointer;
@@ -87,7 +97,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #550000;
 }
 
 .flash {
