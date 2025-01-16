@@ -68,6 +68,11 @@ form {
     margin: 20px auto;
 }
 
+form :is(input, select, textarea, button, label, fieldset, legend) {
+  width: 100%; /* or a specific value, e.g. 200px */
+  box-sizing: border-box;
+}
+
 label {
     display: block;
     margin-top: 10px;

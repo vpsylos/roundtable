@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Tech Support</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
     <main>
@@ -30,6 +31,7 @@
             <br>
             <input type="submit" value="Create Account">
             <p>Already have an account? <a href="{{ url_for('technician_login') }}">Login</a></p>
+            <p><a id="theme-toggle" href="#">Switch to Dark Mode</a></p>
         </form>
     </main>
 </body>
